@@ -19,7 +19,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
                 padding: '10px',
                 width: '300px',
                 borderRadius: '5px',
-                border: '1px solid #ccc'
+                border: '1px solid #ccc',
+                marginTop: 20
             }}
         />
     );
