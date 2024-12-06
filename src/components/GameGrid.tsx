@@ -14,8 +14,6 @@ const GameGrid: React.FC<GameGridProps> = ({ filteredGamePages }) => {
     return (
         <Grid 
             container 
-            spacing={2} 
-            justifyContent="center" 
             className={styles.gridContainer} // Apply the container class
         >
             {filteredGamePages.length > 0 ? (
