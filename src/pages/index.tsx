@@ -47,9 +47,12 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages }) => {
 // Fetch data at build time
 export const getStaticProps = async () => {
     const gamePages = await fetchAllGamePages(); // Fetch game pages from Contentful
+    const sortedGamePages = gamePages.sort((a, b) => 
+        a.title.localeCompare(b.title) // Sort by title
+    );
     return {
         props: {
-            gamePages, // Pass the fetched data to the page component
+            gamePages: sortedGamePages, // Pass the sorted data to the page component
         },
         revalidate: 60, // Optional: Revalidate every 60 seconds
     };
