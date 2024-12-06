@@ -11,7 +11,7 @@ const ContentForm: React.FC<ContentFormProps> = ({ onClose }) => {
     const [formData, setFormData] = useState<Content>({
         title: '',
         cover: undefined,
-        article: { json: null },
+        article: undefined,
         rating: undefined,
         masterpiece: false,
         id: undefined,

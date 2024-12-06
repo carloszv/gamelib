@@ -36,14 +36,15 @@ const GameGrid: React.FC<GameGridProps> = ({ filteredGamePages }) => {
                             <div style={{ 
                                 position: 'relative', // Position relative for the Image to fill
                                 width: '100%', // Full width of the grid item
-                                height: '200px', // Set a fixed height for the image container
+                                height: 'auto', // Set height to auto to maintain aspect ratio
+                                paddingTop: '75%', // Maintain aspect ratio (e.g., 4:3 ratio)
                                 overflow: 'hidden' // Hide overflow to maintain shape
                             }}>
                                 {page.cover?.fields.file.url ? <Image
                                     src={convertURL(page.cover.fields.file.url)} // Access the cover image URL directly
                                     alt={page.title}
                                     layout="fill" // Use fill layout to cover the entire div
-                                    objectFit="cover" // Ensure the image covers the div without distortion
+                                    objectFit="contain" // Ensure the image is fully visible
                                     loading="lazy"
                                 /> : null}
                             </div>

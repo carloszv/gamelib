@@ -24,7 +24,8 @@ export interface Content {
     title: string; // Title of the content
     cover?: ContentImage; // Cover image
     article?: {
-        json: any; // Rich text content in JSON format
+        content: any; // Rich text content in JSON format
+        data: any;
     };
     rating?: number;
     masterpiece?: boolean;

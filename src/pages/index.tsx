@@ -26,7 +26,6 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages }) => {
             alignItems: 'center', 
             justifyContent: 'center', 
             minHeight: '100vh', 
-            marginTop: '40px' 
         }}>
             <SearchBar onSearch={handleSearch} />
             <GameGrid filteredGamePages={filteredGamePages} />

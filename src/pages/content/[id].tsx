@@ -1,11 +1,13 @@
-import React from 'react';
-import { useRouter } from 'next/router';
+import { convertURL } from '@/util/funtions';
+import { documentToHtmlString } from '@contentful/rich-text-html-renderer';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
+import React from 'react';
 import { fetchEntryById } from '../../api/api'; // Import the fetch function
 import { Content } from '../../types/contentTypes'; // Import the Content type
-import {documentToReactComponents} from "@contentful/rich-text-react-renderer";
-import { convertURL } from '@/util/funtions';
-import ArrowBack from '@mui/icons-material/ArrowBack'; // Import the ArrowBack icon
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'; // Import the back arrow icon
+import { Document } from '@contentful/rich-text-types'; // Ensure correct import
 
 const ContentPage = () => {
     const router = useRouter();
@@ -23,28 +25,91 @@ const ContentPage = () => {
         }
     }, [id]);
 
+    const getRatingStyle = (rating: number) => {
+        let backgroundColor = '';
+        if (rating >= 1 && rating < 5) {
+            backgroundColor = 'rgba(255, 255, 0, 0.5)'; // Yellow
+        } else if (rating >= 5 && rating < 7) {
+            backgroundColor = 'rgba(255, 165, 0, 0.5)'; // Orange
+        } else if (rating >= 7 && rating < 9) {
+            backgroundColor = 'rgba(144, 238, 144, 0.5)'; // Light Green
+        } else if (rating >= 9) {
+            backgroundColor = 'rgba(0, 128, 0, 0.5)'; // Dark Green
+        } else {
+            backgroundColor = 'rgba(255, 0, 0, 0.5)'; // Red for 0
+        }
+        return { backgroundColor };
+    };
+
+    const handleBackClick = () => {
+        router.push('/'); // Navigate to the index page
+    };
+
     if (!content) return <div>Loading...</div>;
+
+    console.log(content.article)
 
     return (
         <div style={{ textAlign: 'center', padding: '20px' }}>
-            <div style={{ position: 'absolute', top: '20px', left: '20px', cursor: 'pointer' }} onClick={() => router.push('/')}>
-                <ArrowBack />
+            <button onClick={handleBackClick} style={{
+                position: 'absolute',
+                top: '20px',
+                left: '10px',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+            }}>
+                <ArrowBackIcon style={{ color: 'black' }} />
+            </button>
+            <div style={{ position: 'relative', display: 'inline-block', marginTop: 80, margin: '0 auto', maxWidth: '100%' }}>
+                {content.cover?.fields.file.url ? (
+                    <Image
+                        src={convertURL(content.cover.fields.file.url)} // Use the cover image
+                        alt={content.title}
+                        width={600}
+                        height={400}
+                        style={{ maxWidth: '100%', height: 'auto', objectFit: 'contain' }} // Ensure the image is fully visible
+                    />
+                ) : null}
+                {content.rating && <div style={{
+                    position: 'absolute',
+                    bottom: '10px', // Position from the top
+                    right: '10px', // Position from the right
+                    display: 'inline-block',
+                    width: '80px', // Circle width
+                    height: '80px', // Circle height
+                    borderRadius: '50%',
+                    lineHeight: '80px', // Center text vertically
+                    textAlign: 'center',
+                    color: 'white',
+                    fontWeight: 'bold',
+                    fontSize: '24px', // Font size
+                    border: '3px solid white', // Thin white border
+                    ...getRatingStyle(content.rating)
+                }}>
+                    {content.rating}
+                </div>}
+                {content.masterpiece && (
+                    <EmojiEventsIcon style={{
+                        position: 'absolute',
+                        top: '2px', // Position from the top
+                        right: '10px', // Position next to the rating circle
+                        color: 'yellow',
+                        padding: '2px',
+                        width: '40px', // Circle width
+                        height: '40px', // Circle height
+                        zIndex: 100,
+                    }} />
+                )}
             </div>
-            {content.cover?.fields.file.url ? <Image
-                src={convertURL(content.cover.fields.file.url)} // Use the cover image
-                alt={content.title}
-                width={600}
-                height={400}
-            /> : null}
-            <h1>{content.title}</h1>
-            {content.article?.json && <div>
-                {documentToReactComponents(content.article.json)}
-            </div>}
-            {content.rating}
-            {content.masterpiece}
+            <h1 style={{ textAlign: 'center', margin: '20px 0' }}>{content.title}</h1>
+            {content.article && <div style={{ marginTop: '20px', textAlign: 'center', lineHeight: '1.6' }} dangerouslySetInnerHTML={{ __html: documentToHtmlString(content.article as Document) }} />}
             <div style={{ marginTop: '20px' }}>
-                <a href={content.externalLink1} target="_blank" rel="noopener noreferrer">External Link 1</a>
-                <a href={content.externalLink2} target="_blank" rel="noopener noreferrer">External Link 2</a>
+                {content.masterpiece}
+                <div style={{ marginTop: '20px' }}>
+                    {content.externalLink1 && <a href={content.externalLink1} target="_blank" rel="noopener noreferrer">External Link 1</a>}
+                    {content.externalLink2 && <a href={content.externalLink2} target="_blank" rel="noopener noreferrer">External Link 2</a>}
+                </div>
             </div>
         </div>
     );

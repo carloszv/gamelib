@@ -8,7 +8,8 @@ export interface GamePageType {
         title: string;
     };
     article: {
-        json: string;
+        content: any;
+        data: any;
     };
     rating: number;
     masterpiece: boolean;
