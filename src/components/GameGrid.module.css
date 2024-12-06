@@ -12,18 +12,19 @@
     padding: 10px; /* Optional: Add padding for better spacing */
     overflow: hidden; /* Ensure overflow is hidden to maintain frame shape */
     cursor: pointer; /* Change cursor to pointer on hover */
-    margin: 5px; /* Reduce margin for better spacing */
     flex: 0 0 45%; /* Set default width for items */
 }
 
 @media (max-width: 430px) {
     .gridItem {
         flex: 0 0 45%; /* Two items per row on mobile, adjust width */
+        margin: 2px;
     }
 }
 
 @media (min-width: 431px) {
     .gridItem {
         flex: 0 0 25%; /* Four items per row on larger screens */
+        margin: 10px;
     }
 } 

@@ -32,7 +32,7 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages }) => {
                 backgroundColor: 'lightblue', 
                 padding: '20px', 
                 borderRadius: '5px', 
-                margin: '10px 0', 
+                margin: '10px 0 30px', 
                 display: 'flex', 
                 alignItems: 'center', 
                 justifyContent: 'center', 
