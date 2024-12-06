@@ -28,6 +28,17 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages }) => {
             minHeight: '100vh', 
         }}>
             <SearchBar onSearch={handleSearch} />
+            <div style={{ 
+                backgroundColor: 'lightblue', 
+                padding: '20px', 
+                borderRadius: '5px', 
+                margin: '10px 0', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+            }}>
+                <span style={{ color: 'white', fontSize: '32px' }}>{gamePages.length}</span>
+            </div>
             <GameGrid filteredGamePages={filteredGamePages} />
         </div>
     );

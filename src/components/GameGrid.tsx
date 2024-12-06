@@ -30,7 +30,8 @@ const GameGrid: React.FC<GameGridProps> = ({ filteredGamePages }) => {
                         textAlign: 'center', // Center the text
                         padding: '10px', // Optional: Add padding for better spacing
                         overflow: 'hidden', // Ensure overflow is hidden to maintain frame shape
-                        cursor: 'pointer' // Change cursor to pointer on hover
+                        cursor: 'pointer', // Change cursor to pointer on hover
+                        margin: '10px' // Add margin between grid items
                     }}>
                         <Link href={`/content/${page.id}`} passHref> {/* Link to the page */}
                             <div style={{ 
