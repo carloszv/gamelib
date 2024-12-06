@@ -1,6 +1,6 @@
 import { createClient } from 'contentful';
 import { Content } from '../types/contentTypes'; // Import the Content type
-import { Entry } from '../types/entryTypes'; // Import the Entry type
+
 
 import { createClient as createManagementClient } from 'contentful-management';
 
@@ -28,17 +28,6 @@ export const fetchEntryById = async (id: string): Promise<Content | null> => {
     } catch (error) {
         console.error('Error fetching entry:', error);
         return null;
-    }
-};
-
-// Function to fetch all entries of a specific content type
-export const fetchEntriesByContentType = async (contentType: string): Promise<Entry<Content>[]> => {
-    try {
-        const response = await client.getEntries({ content_type: contentType });
-        return response.items as unknown as Entry<Content>[];
-    } catch (error) {
-        console.error('Error fetching entries:', error);
-        return [];
     }
 };
 
