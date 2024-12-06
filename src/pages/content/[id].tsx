@@ -51,17 +51,16 @@ const ContentPage = () => {
 
     return (
         <div style={{ textAlign: 'center', padding: '20px' }}>
-            <button onClick={handleBackClick} style={{
-                position: 'absolute',
-                top: '20px',
-                left: '10px',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-            }}>
-                <ArrowBackIcon style={{ color: 'black' }} />
-            </button>
-            <div style={{ position: 'relative', display: 'inline-block', marginTop: 80, margin: '0 auto', maxWidth: '100%' }}>
+            <div style={{width: '100%', display: 'flex', marginBottom: 20}}>
+                <button onClick={handleBackClick} style={{
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                }}>
+                    <ArrowBackIcon style={{ color: 'black' }} />
+                </button>
+            </div>
+            <div style={{ position: 'relative', display: 'inline-block', marginTop: 100, margin: '0 auto', maxWidth: '100%' }}>
                 {content.cover?.fields.file.url ? (
                     <Image
                         src={convertURL(content.cover.fields.file.url)} // Use the cover image
