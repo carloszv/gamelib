@@ -41,7 +41,7 @@ export const fetchAllGamePages = async (): Promise<Content[]> => {
                 cover: item.fields.cover || null,
                 article: item.fields.article || null,
                 rating: item.fields.rating || null,
-                stamp: item.fields.stamp || null,
+                masterpiece: item.fields.masterpiece || null,
                 id: item.sys.id  || null,
                 externalLink1: item.fields.externaLink1 || null,
                 externalLink2: item.fields.externaLink2 || null

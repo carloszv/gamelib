@@ -19,16 +19,16 @@
     flex: 0 0 45%; /* Set default width for items */
 }
 
-@media (max-width: 430px) {
+@media (max-width: 430px) { /* Mobile */
     .gridItem {
-        flex: 0 0 45%; /* Two items per row on mobile, adjust width */
+        flex: 0 0 40%; /* Two items per row on mobile, adjust width */
         margin: 2px;
     }
 }
 
-@media (min-width: 431px) {
+@media (min-width: 431px) { /* Desktop */
     .gridItem {
-        flex: 0 0 25%; /* Four items per row on larger screens */
+        flex: 0 0 60%; /* Four items per row on larger screens */
         margin: 10px;
     }
 } 
