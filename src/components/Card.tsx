@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
         fontWeight: 'bold',
         fontSize: '16px', // Font size
         border: '3px solid white', // Thin white border
-        '@media (max-width: 430px)': {
+        '@media (max-width: 600px)': {
             bottom: '5px', // Position from the top
             right: '30px', // Position from the right
             width: '25px', // Circle width
@@ -48,7 +48,7 @@ const useStyles = makeStyles((theme) => ({
         width: '20px', // Circle width
         height: '20px', // Circle height
         zIndex: 100,
-        '@media (max-width: 430px)': {
+        '@media (max-width: 600px)': {
             right: '30px', // Position from the right
             width: '20px', // Circle width
             height: '20px', // Circle height
