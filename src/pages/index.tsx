@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import GameGrid from '../components/GameGrid';
 import SearchBar from '../components/SearchBar';
 import { Content } from '../types/contentTypes';
+import ScrollToTopButton from '@/components/ScrollTotopButton';
 
 interface HomePageProps {
     gamePages: Content[];
@@ -55,6 +56,7 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages }) => {
                 <span style={{ color: 'white', fontSize: '32px' }}>{filteredGamePages.length}</span>
             </div>
             <GameGrid filteredGamePages={filteredGamePages} />
+            <ScrollToTopButton />
         </div>
     );
 };
