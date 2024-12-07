@@ -67,26 +67,25 @@ const Card: React.FC<CardProps> = ({ page, className }) => {
     return (
         <Grid item xs={6} sm={4} md={3} key={page.id} className={className}>
             <Link href={`/content/${page.id}`} passHref>
-                <div className={classes.card}>
-                    {page.cover?.fields.file.url ? (
-                        <div>
-                            <Image
-                                src={convertURL(page.cover.fields.file.url)} 
-                                alt={page.title}
-                                layout="fill" 
-                                objectFit="contain" 
-                                loading="lazy"
-                            />
-                            {page.rating && <div className={classes.ratingCircle} style={{ ...getRatingStyle(page.rating) }}>
-                                {page.rating}
-                            </div>}
-                            {page.masterpiece && (
-                                <EmojiEventsIcon className={classes.emoji} />
-                            )}
-                        </div>
-                    ) : null}
-                
-                </div>
+                {page.cover?.fields.file.url ? (
+                    <div className={classes.card} style={{position: 'relative'}}>
+                        <Image
+                            src={convertURL(page.cover.fields.file.url)} 
+                            alt={page.title}
+                            fill
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            style={{ objectFit:"contain" }}
+                            loading="lazy"
+                            priority={false}
+                        />
+                        {page.rating && <div className={classes.ratingCircle} style={{ ...getRatingStyle(page.rating) }}>
+                            {page.rating}
+                        </div>}
+                        {page.masterpiece && (
+                            <EmojiEventsIcon className={classes.emoji} />
+                        )}
+                    </div>
+                ) : null}
                 <h2>{page.title}</h2>
             </Link>
         </Grid>

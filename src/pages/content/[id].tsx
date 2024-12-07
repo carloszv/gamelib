@@ -33,8 +33,6 @@ const ContentPage = () => {
 
     if (!content) return <div>Loading...</div>;
 
-    console.log(content.article)
-
     return (
         <div style={{ textAlign: 'center', padding: '20px' }}>
             <div style={{width: '100%', display: 'flex', marginBottom: 20}}>
@@ -54,6 +52,7 @@ const ContentPage = () => {
                         width={600}
                         height={400}
                         style={{ maxWidth: '100%', height: 'auto', objectFit: 'contain' }} // Ensure the image is fully visible
+                        priority={false}
                     />
                 ) : null}
                 {content.rating && <div style={{

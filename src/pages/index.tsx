@@ -1,22 +1,37 @@
 import { fetchAllGamePages } from '@/api/api';
 import React, { useState } from 'react';
-import GameGrid from '../components/GameGrid'; // Import the GameGrid component
+import GameGrid from '../components/GameGrid';
 import SearchBar from '../components/SearchBar';
-import { Content } from '../types/contentTypes'; // Import the Content type
-import AddButton from '../components/AddButton'; // Import the AddButton component
+import { Content } from '../types/contentTypes';
+import AddButton from '../components/AddButton';
+import { PLATFORMS } from '@/util/constants';
+import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { SelectChangeEvent } from '@mui/material';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import SearchFilter from '@/components/SearchFilter';
 
 interface HomePageProps {
-    gamePages: Content[]; // Define the props type
+    gamePages: Content[];
 }
 
 const HomePage: React.FC<HomePageProps> = ({ gamePages }) => {
-    const [filteredGamePages, setFilteredGamePages] = useState<Content[]>(gamePages); // State for filtered game pages
+    const [filteredGamePages, setFilteredGamePages] = useState<Content[]>(gamePages);
+    const [selectedPlatform, setSelectedPlatform] = useState<string>('');
 
     const handleSearch = (query: string) => {
         const filtered = gamePages.filter(page => 
-            page.title.toLowerCase().includes(query.toLowerCase()) // Filter by title
+            page.title.toLowerCase().includes(query.toLowerCase())
         );
-        setFilteredGamePages(filtered); // Update state with filtered results
+        setFilteredGamePages(filtered);
+    };
+
+    const handlePlatformChange = (event: SelectChangeEvent<string>) => {
+        const platform = event.target.value as string;
+        setSelectedPlatform(platform);
+        const filtered = gamePages.filter(page =>
+            platform ? page.platform === platform : true
+        );
+        setFilteredGamePages(filtered);
     };
 
     return (
@@ -27,7 +42,10 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages }) => {
             justifyContent: 'center', 
             minHeight: '100vh', 
         }}>
-            <SearchBar onSearch={handleSearch} />
+            <div style={{ display: 'flex', alignItems: 'center', marginTop: 20 }}>
+                <SearchBar onSearch={handleSearch} />
+                <SearchFilter selectedPlatform={selectedPlatform} handlePlatformChange={handlePlatformChange} PLATFORMS={PLATFORMS} />
+            </div>
             <div style={{ 
                 backgroundColor: 'lightblue', 
                 padding: '20px', 
@@ -37,7 +55,7 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages }) => {
                 alignItems: 'center', 
                 justifyContent: 'center', 
             }}>
-                <span style={{ color: 'white', fontSize: '32px' }}>{gamePages.length}</span>
+                <span style={{ color: 'white', fontSize: '32px' }}>{filteredGamePages.length}</span>
             </div>
             <GameGrid filteredGamePages={filteredGamePages} />
         </div>
@@ -46,15 +64,15 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages }) => {
 
 // Fetch data at build time
 export const getStaticProps = async () => {
-    const gamePages = await fetchAllGamePages(); // Fetch game pages from Contentful
+    const gamePages = await fetchAllGamePages();
     const sortedGamePages = gamePages.sort((a, b) => 
-        a.title.localeCompare(b.title) // Sort by title
+        a.title.localeCompare(b.title)
     );
     return {
         props: {
-            gamePages: sortedGamePages, // Pass the sorted data to the page component
+            gamePages: sortedGamePages,
         },
-        revalidate: 60, // Optional: Revalidate every 60 seconds
+        revalidate: 60,
     };
 };
 

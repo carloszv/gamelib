@@ -1,26 +1,47 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { TextField, InputAdornment, IconButton } from '@mui/material';
+import ClearIcon from '@mui/icons-material/Clear';
 
 interface SearchBarProps {
     onSearch: (query: string) => void;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
+    const [searchQuery, setSearchQuery] = useState('');
+
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        onSearch(event.target.value);
+        const query = event.target.value;
+        setSearchQuery(query);
+        onSearch(query);
+    };
+
+    const handleClear = () => {
+        setSearchQuery('');
+        onSearch('');
     };
 
     return (
-        <input 
-            type="text" 
-            placeholder="Search..." 
+        <TextField
+            fullWidth
+            variant="outlined"
+            placeholder="Search..."
+            value={searchQuery}
             onChange={handleChange}
-            style={{
-                fontSize: '16px',
-                padding: '10px',
-                width: '300px',
-                borderRadius: '5px',
-                border: '1px solid #ccc',
-                marginTop: 20
+            InputProps={{
+                style: {
+                    fontSize: '16px',
+                },
+                endAdornment: searchQuery && (
+                    <InputAdornment position="end">
+                        <IconButton
+                            size="small"
+                            onClick={handleClear}
+                            edge="end"
+                        >
+                            <ClearIcon fontSize="small" />
+                        </IconButton>
+                    </InputAdornment>
+                )
             }}
         />
     );
