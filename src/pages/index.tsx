@@ -1,14 +1,11 @@
 import { fetchAllGamePages } from '@/api/api';
+import SearchFilter from '@/components/SearchFilter';
+import { PLATFORMS } from '@/util/constants';
+import { SelectChangeEvent } from '@mui/material';
 import React, { useState } from 'react';
 import GameGrid from '../components/GameGrid';
 import SearchBar from '../components/SearchBar';
 import { Content } from '../types/contentTypes';
-import AddButton from '../components/AddButton';
-import { PLATFORMS } from '@/util/constants';
-import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
-import { SelectChangeEvent } from '@mui/material';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import SearchFilter from '@/components/SearchFilter';
 
 interface HomePageProps {
     gamePages: Content[];
