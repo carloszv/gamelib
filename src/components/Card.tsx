@@ -9,7 +9,14 @@ import { getRatingStyle } from '@/util/funtions';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 
 const useStyles = makeStyles((theme) => ({
-   ratingCircle: {
+    card: {
+        position: 'relative', 
+        width: '100%', 
+        height: 'auto', 
+        paddingTop: '75%', 
+        overflow: 'hidden' 
+    },
+    ratingCircle: {
         position: 'absolute',
         bottom: '10px', // Position from the top
         right: '60px', // Position from the right
@@ -57,18 +64,10 @@ interface CardProps {
 const Card: React.FC<CardProps> = ({ page, className }) => {
     const classes = useStyles(); // Use the styles
 
-    console.log(page);
-
     return (
         <Grid item xs={6} sm={4} md={3} key={page.id} className={className}>
             <Link href={`/content/${page.id}`} passHref>
-                <div style={{ 
-                    position: 'relative', 
-                    width: '100%', 
-                    height: 'auto', 
-                    paddingTop: '75%', 
-                    overflow: 'hidden' 
-                }}>
+                <div className={classes.card}>
                     {page.cover?.fields.file.url ? (
                         <div>
                             <Image
