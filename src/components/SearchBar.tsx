@@ -30,6 +30,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
             InputProps={{
                 style: {
                     fontSize: '16px',
+                    maxWidth: 200
                 },
                 endAdornment: searchQuery && (
                     <InputAdornment position="end">
