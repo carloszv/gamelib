@@ -3,6 +3,7 @@ export interface GamePageType {
         id: string;
     };
     title: string;
+    platform: string;
     cover: {
         url: string;
         title: string;

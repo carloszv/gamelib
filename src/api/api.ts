@@ -38,6 +38,7 @@ export const fetchAllGamePages = async (): Promise<Content[]> => {
         return response.items.map((item: any) => (
             {
                 title: item.fields.title,
+                paltform: item.fields.platform || null,
                 cover: item.fields.cover || null,
                 article: item.fields.article || null,
                 rating: item.fields.rating || null,

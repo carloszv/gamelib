@@ -22,6 +22,7 @@ export interface ContentImage {
 
 export interface Content {
     title: string; // Title of the content
+    platform: string;
     cover?: ContentImage; // Cover image
     article?: {
         content: any; // Rich text content in JSON format
