@@ -45,7 +45,7 @@ const Video = ({
             /(?:https?:\/\/)?(?:youtu\.be\/)?([^&]+)/
         ];
 
-        for (let regex of regExps) {
+        for (const regex of regExps) {
             const match = url.match(regex);
             if (match) return match[1];
         }
