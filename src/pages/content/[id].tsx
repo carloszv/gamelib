@@ -8,6 +8,8 @@ import { fetchEntryById } from '../../api/api'; // Import the fetch function
 import { Content } from '../../types/contentTypes'; // Import the Content type
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'; // Import the back arrow icon
 import { Document } from '@contentful/rich-text-types'; // Ensure correct import
+import Video from '@/components/Video';
+import ExternalLinks from '@/components/ExternalLinks';
 
 const ContentPage = () => {
     const router = useRouter();
@@ -87,12 +89,12 @@ const ContentPage = () => {
                 )}
             </div>
             <h1 style={{ textAlign: 'center', margin: '20px 0' }}>{content.title}</h1>
-            {content.article && <div style={{ marginTop: '20px', textAlign: 'center', lineHeight: '1.6' }} dangerouslySetInnerHTML={{ __html: documentToHtmlString(content.article as Document) }} />}
+            {content.article && <div style={{ display: 'inline-block', textAlign: 'justify', lineHeight: '1.6' }} dangerouslySetInnerHTML={{ __html: documentToHtmlString(content.article as Document) }} />}
             <div style={{ marginTop: '20px' }}>
                 {content.masterpiece}
                 <div style={{ marginTop: '20px' }}>
-                    {content.externalLink1 && <a href={content.externalLink1} target="_blank" rel="noopener noreferrer">External Link 1</a>}
-                    {content.externalLink2 && <a href={content.externalLink2} target="_blank" rel="noopener noreferrer">External Link 2</a>}
+                    {content.videoReview && <Video url={content.videoReview} />}
+                    <ExternalLinks externalLinks={[content.externalLink1, content.externalLink2, content.externalLink3]} />
                 </div>
             </div>
         </div>
