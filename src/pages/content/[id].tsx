@@ -185,32 +185,52 @@ const ContentPage = () => {
                 maxWidth="xl"
                 fullWidth
                 TransitionComponent={Zoom}
+                PaperProps={{
+                    sx: {
+                        borderRadius: 4, // Add overall rounded corners to the dialog
+                        maxWidth: '95%',
+                        margin: 'auto'
+                    }
+                }}
             >
-                <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Typography variant="h6">{content.title}</Typography>
-                    <IconButton onClick={handleCloseFullScreen}>
-                        <CloseIcon />
-                    </IconButton>
-                </DialogTitle>
                 <DialogContent 
                     sx={{ 
                         display: 'flex', 
                         justifyContent: 'center', 
                         alignItems: 'center', 
-                        minHeight: '70vh',
-                        backgroundColor: '#f0f0f0'
+                        minHeight: '80vh',
+                        backgroundColor: '#f0f0f0',
+                        position: 'relative',
+                        p: 0, // Remove padding
                     }}
                 >
+                    {/* Close button */}
+                    <IconButton 
+                        onClick={handleCloseFullScreen}
+                        sx={{
+                            position: 'absolute',
+                            top: 10,
+                            right: 10,
+                            zIndex: 10,
+                            backgroundColor: 'rgba(255,255,255,0.7)',
+                            '&:hover': {
+                                backgroundColor: 'rgba(255,255,255,0.9)'
+                            }
+                        }}
+                    >
+                        <CloseIcon />
+                    </IconButton>
+
                     {content.cover?.fields.file.url && (
                         <Image
                             src={convertURL(content.cover.fields.file.url)}
                             alt={content.title}
-                            width={1200}
-                            height={800}
+                            width={1600}
+                            height={1000}
                             style={{ 
                                 maxWidth: '100%', 
-                                maxHeight: '80vh', 
-                                objectFit: 'contain'
+                                maxHeight: '95vh', 
+                                objectFit: 'contain',
                             }}
                         />
                     )}
