@@ -7,6 +7,7 @@ import GameGrid from '../components/GameGrid';
 import SearchBar from '../components/SearchBar';
 import { Content } from '../types/contentTypes';
 import ScrollToTopButton from '@/components/ScrollTotopButton';
+import ListCounter from '@/components/ListCounter';
 
 interface HomePageProps {
     gamePages: Content[];
@@ -44,17 +45,7 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages }) => {
                 <SearchBar onSearch={handleSearch} />
                 <SearchFilter selectedPlatform={selectedPlatform} handlePlatformChange={handlePlatformChange} PLATFORMS={PLATFORMS} />
             </div>
-            <div style={{ 
-                backgroundColor: 'lightblue', 
-                padding: '20px', 
-                borderRadius: '5px', 
-                margin: '10px 0 30px', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center', 
-            }}>
-                <span style={{ color: 'white', fontSize: '32px' }}>{filteredGamePages.length}</span>
-            </div>
+            <ListCounter filteredGamePages={filteredGamePages} />
             <GameGrid filteredGamePages={filteredGamePages} />
             <ScrollToTopButton />
         </div>
