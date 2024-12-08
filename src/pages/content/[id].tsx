@@ -1,27 +1,27 @@
-import React, { useState } from 'react';
+import ExternalLinks from '@/components/ExternalLinks';
+import Video from '@/components/Video';
 import { convertURL, getRatingStyle } from '@/util/funtions';
 import { documentToHtmlString } from '@contentful/rich-text-html-renderer';
+import { Document } from '@contentful/rich-text-types';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CloseIcon from '@mui/icons-material/Close';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import {
+    Box,
+    CircularProgress,
+    Container,
+    Dialog,
+    DialogContent,
+    IconButton,
+    Paper,
+    Typography,
+    Zoom
+} from '@mui/material';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
+import React, { useState } from 'react';
 import { fetchEntryById } from '../../api/api';
 import { Content } from '../../types/contentTypes';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { Document } from '@contentful/rich-text-types';
-import Video from '@/components/Video';
-import ExternalLinks from '@/components/ExternalLinks';
-import { 
-    Typography, 
-    Container, 
-    Box, 
-    IconButton, 
-    Paper, 
-    Dialog, 
-    DialogContent, 
-    DialogTitle,
-    Zoom 
-} from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
 
 const ContentPage = () => {
     const router = useRouter();
@@ -54,7 +54,19 @@ const ContentPage = () => {
 
     if (!content) return (
         <Container maxWidth="md" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-            <Typography variant="h4">Loading...</Typography>
+            <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                minHeight: '100vh'
+            }}>
+                <CircularProgress 
+                    color="secondary" 
+                    size={60} 
+                    thickness={4} 
+                    variant="indeterminate"
+                />
+            </div>
         </Container>
     );
 

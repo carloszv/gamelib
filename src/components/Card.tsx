@@ -75,7 +75,7 @@ interface CardProps {
     className?: string;
 }
 
-const Card: React.FC<CardProps> = ({ page, className }) => {
+const Card: React.FC<CardProps> = ({ page }) => {
     const classes = useStyles();
 
     return (
