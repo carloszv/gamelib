@@ -1,18 +1,6 @@
 import { createClient } from 'contentful';
 import { Content } from '../types/contentTypes'; // Import the Content type
 
-
-import { createClient as createManagementClient } from 'contentful-management';
-
-
-
-// Create a Contentful management client
-const managementClient = createManagementClient({
-    accessToken: process.env.CONTENTFUL_ACCESS_TOKEN || 'vjWADSYnRfJWkGWqEsXnd-HbCCs9uJ8NInQQPGJGGqc', // Use your management access token
-    host: "cdn.contentful.com"
-});
-
-
 // Create a Contentful client
 const client = createClient({
     space: process.env.CONTENTFUL_SPACE_ID || 'q1j74ir7zza4', // Replace with a valid default if needed
@@ -44,39 +32,14 @@ export const fetchAllGamePages = async (): Promise<Content[]> => {
                 rating: item.fields.rating || null,
                 masterpiece: item.fields.masterpiece || null,
                 id: item.sys.id  || null,
+                videoReview: item.fields.videoReview || null,
                 externalLink1: item.fields.externaLink1 || null,
-                externalLink2: item.fields.externaLink2 || null
+                externalLink2: item.fields.externaLink2 || null,
+                externalLink3: item.fields.externaLink2 || null,
             }
         )) as unknown as Content[]; // Cast to unknown first, then to Content
     } catch (error) {
         console.error('Error fetching game pages:', error);
         return [];
-    }
-};
-
-// Function to create a new content entry
-export const fetchCreateContent = async (contentData: Content): Promise<void> => {
-    try {
-        const space = await managementClient.getSpace('q1j74ir7zza4');
-        const environment = await space.getEnvironment('master');
-
-        const entry = await environment.createEntry('gamePage', {
-            fields: {
-                title: { 'en-US': contentData.title },
-                cover: contentData.cover ? { 'en-US': contentData.cover } : undefined,
-                article: contentData.article ? { 'en-US': contentData.article } : undefined,
-                rating: contentData.rating,
-                masterpiece: contentData.masterpiece,
-                externalLink1: { 'en-US': contentData.externalLink1 },
-                externalLink2: { 'en-US': contentData.externalLink2 },
-            },
-        });
-    
-        await entry.update();
-        await entry.publish();
-
-        console.log('Entry created:', entry);
-    } catch (error) {
-        console.error('Error creating entry:', error);
     }
 };

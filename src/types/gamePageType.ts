@@ -14,6 +14,8 @@ export interface GamePageType {
     };
     rating: number;
     masterpiece: boolean;
-    externaLink1: string;
-    externaLink2: string;
+    videoReview: string;
+    externalLink1: string;
+    externalLink2: string;
+    externalLink3: string;
 }

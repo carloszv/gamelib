@@ -1075,16 +1075,6 @@ concat-map@0.0.1:
   resolved "https://registry.yarnpkg.com/concat-map/-/concat-map-0.0.1.tgz#d8a96bd77fd68df7793a73036a3ba0d5405d477b"
   integrity sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==
 
-contentful-management@^11.40.2:
-  version "11.40.2"
-  resolved "https://registry.yarnpkg.com/contentful-management/-/contentful-management-11.40.2.tgz#475d36d084f5e2474888bff7f9eff1dac5e0e447"
-  integrity sha512-DjbGkExhhT5C/tMjotvrf6yMb3LRS9aiwikj7X628N5DwgLy+AyAgYwad1gyIIc7NF7XXBMCmP0BzC0oq88ZjQ==
-  dependencies:
-    "@contentful/rich-text-types" "^16.6.1"
-    axios "^1.7.4"
-    contentful-sdk-core "^9.0.1"
-    fast-copy "^3.0.0"
-
 contentful-resolve-response@^1.9.0:
   version "1.9.0"
   resolved "https://registry.yarnpkg.com/contentful-resolve-response/-/contentful-resolve-response-1.9.0.tgz#7a89e6f332d32b98c6e98af9406ce7aa64707711"
@@ -1625,7 +1615,7 @@ fast-copy@^2.1.7:
   resolved "https://registry.yarnpkg.com/fast-copy/-/fast-copy-2.1.7.tgz#affc9475cb4b555fb488572b2a44231d0c9fa39e"
   integrity sha512-ozrGwyuCTAy7YgFCua8rmqmytECYk/JYAMXcswOcm0qvGoE3tPb7ivBeIHTOK2DiapBhDZgacIhzhQIKU5TCfA==
 
-fast-copy@^3.0.0, fast-copy@^3.0.2:
+fast-copy@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/fast-copy/-/fast-copy-3.0.2.tgz#59c68f59ccbcac82050ba992e0d5c389097c9d35"
   integrity sha512-dl0O9Vhju8IrcLndv2eU4ldt1ftXMqqfgN4H1cpmGV7P6jeB9FwpN9a2c8DPGE1Ys88rNUJVYDHq73CGAGOPfQ==

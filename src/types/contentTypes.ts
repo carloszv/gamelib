@@ -22,7 +22,7 @@ export interface ContentImage {
 
 export interface Content {
     title: string; // Title of the content
-    platform: string;
+    platform?: string;
     cover?: ContentImage; // Cover image
     article?: {
         content: any; // Rich text content in JSON format
@@ -31,6 +31,8 @@ export interface Content {
     rating?: number;
     masterpiece?: boolean;
     id?: string; // Custom ID field
-    externalLink1?: string
-    externalLink2?: string
+    videoReview?: string;
+    externalLink1?: string;
+    externalLink2?: string;
+    externalLink3?: string;
 } 
