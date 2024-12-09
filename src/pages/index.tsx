@@ -9,6 +9,29 @@ import GameGrid from '../components/GameGrid';
 import SearchBar from '../components/SearchBar';
 import { Content } from '../types/contentTypes';
 import WishlistButton from '@/components/WishlistButton';
+import { makeStyles } from '@mui/styles';
+
+const useStyles = makeStyles((theme) => ({
+    loadingSpinner: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        backgroundColor: '#f0f0f0'
+    },
+    page: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+    },
+    topBar: {
+        display: 'flex', 
+        alignItems: 'center', 
+        marginTop: 20,
+    }
+}));
 
 // Utility function to preload images
 const preloadImages = (gamePages: Content[]) => {
@@ -30,6 +53,8 @@ interface HomePageProps {
 }
 
 const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesWishList }) => {
+    const classes = useStyles();
+
     const [filteredGamePages, setFilteredGamePages] = useState<Content[]>(gamePages);
     const [selectedPlatform, setSelectedPlatform] = useState<string>('');
     const [imagesLoaded, setImagesLoaded] = useState<boolean>(false);
@@ -84,13 +109,7 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesWishList }) => 
     // Show loading spinner until images are loaded
     if (!imagesLoaded) {
         return (
-            <div style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                minHeight: '100vh',
-                backgroundColor: '#f0f0f0'
-            }}>
+            <div className={classes.loadingSpinner}>
                 <CircularProgress 
                     color="secondary" 
                     size={80} 
@@ -102,18 +121,8 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesWishList }) => 
     }
 
     return (
-        <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minHeight: '100vh',
-        }}>
-            <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                marginTop: 20,
-            }}>
+        <div className={classes.page}>
+            <div className={classes.topBar}>
                 <SearchBar onSearch={handleSearch} />
                 <SearchFilter 
                     selectedPlatform={selectedPlatform} 

@@ -37,12 +37,12 @@ const GameGrid: React.FC<GameGridProps> = ({ filteredGamePages }) => {
                 <div className="flex justify-center items-center w-full max-w-full px-4">
                     <div className="w-full max-w-md">
                         <Image
-                        src="/not_found.png"
-                        alt="not found"
-                        layout="responsive"
-                        width={600}
-                        height={600}
-                        className="brightness-90" // Equivalent to filter: brightness(0.9)
+                            src="/not_found.png"
+                            alt="not found"
+                            layout="responsive"
+                            width={600}
+                            height={600}
+                            className="brightness-90" // Equivalent to filter: brightness(0.9)
                         />
                     </div>
                 </div>
