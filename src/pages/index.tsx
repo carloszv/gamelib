@@ -1,13 +1,14 @@
 import { fetchAllGamePages } from '@/api/api';
+import ListCounter from '@/components/ListCounter';
+import ScrollToTopButton from '@/components/ScrollTotopButton';
 import SearchFilter from '@/components/SearchFilter';
 import { PLATFORMS } from '@/util/constants';
-import { SelectChangeEvent, CircularProgress } from '@mui/material';
-import React, { useState, useEffect } from 'react';
+import { CircularProgress, SelectChangeEvent } from '@mui/material';
+import React, { useEffect, useState } from 'react';
 import GameGrid from '../components/GameGrid';
 import SearchBar from '../components/SearchBar';
 import { Content } from '../types/contentTypes';
-import ScrollToTopButton from '@/components/ScrollTotopButton';
-import ListCounter from '@/components/ListCounter';
+import WishlistButton from '@/components/WishlistButton';
 
 // Utility function to preload images
 const preloadImages = (gamePages: Content[]) => {
@@ -15,9 +16,9 @@ const preloadImages = (gamePages: Content[]) => {
         gamePages.map(page => 
             new Promise<void>((resolve, reject) => {
                 const img = new Image();
-                img.src = page.cover?.fields.file.url || ''; // Assumes each content item has a coverImage property
+                img.src = page.cover?.fields.file.url || ''; 
                 img.onload = () => resolve();
-                img.onerror = () => resolve(); // Resolve even if image fails to load
+                img.onerror = () => resolve(); 
             })
         )
     );
@@ -25,12 +26,14 @@ const preloadImages = (gamePages: Content[]) => {
 
 interface HomePageProps {
     gamePages: Content[];
+    gamePagesWishList: Content[];
 }
 
-const HomePage: React.FC<HomePageProps> = ({ gamePages }) => {
+const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesWishList }) => {
     const [filteredGamePages, setFilteredGamePages] = useState<Content[]>(gamePages);
     const [selectedPlatform, setSelectedPlatform] = useState<string>('');
     const [imagesLoaded, setImagesLoaded] = useState<boolean>(false);
+    const [showWishList, setShowWishList] = useState<boolean>(false);
 
     useEffect(() => {
         // Preload images when component mounts or gamePages changes
@@ -40,7 +43,7 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages }) => {
                 setImagesLoaded(true);
             } catch (error) {
                 console.error('Error preloading images:', error);
-                setImagesLoaded(true); // Ensure we don't get stuck in loading state
+                setImagesLoaded(true);
             }
         };
 
@@ -48,7 +51,8 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages }) => {
     }, [gamePages]);
 
     const handleSearch = (query: string) => {
-        const filtered = gamePages.filter(page =>
+        const currentList = showWishList ? gamePagesWishList : gamePages;
+        const filtered = currentList.filter(page =>
             page.title.toLowerCase().includes(query.toLowerCase())
         );
         setFilteredGamePages(filtered);
@@ -57,9 +61,23 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages }) => {
     const handlePlatformChange = (event: SelectChangeEvent<string>) => {
         const platform = event.target.value as string;
         setSelectedPlatform(platform);
-        const filtered = gamePages.filter(page =>
+        const currentList = showWishList ? gamePagesWishList : gamePages;
+        const filtered = currentList.filter(page =>
             platform ? page.platform === platform : true
         );
+        setFilteredGamePages(filtered);
+    };
+
+    const handleShowWishlist = () => {
+        if (gamePagesWishList.length === 0) return;
+
+        setShowWishList(!showWishList);
+        
+        const currentList = !showWishList ? gamePagesWishList : gamePages;
+        const filtered = currentList.filter(page =>
+            selectedPlatform ? page.platform === selectedPlatform : true
+        );
+        
         setFilteredGamePages(filtered);
     };
 
@@ -91,12 +109,21 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages }) => {
             justifyContent: 'center',
             minHeight: '100vh',
         }}>
-            <div style={{ display: 'flex', alignItems: 'center', marginTop: 20 }}>
+            <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                marginTop: 20,
+            }}>
                 <SearchBar onSearch={handleSearch} />
                 <SearchFilter 
                     selectedPlatform={selectedPlatform} 
                     handlePlatformChange={handlePlatformChange} 
                     PLATFORMS={PLATFORMS} 
+                />
+                <WishlistButton
+                    showWishList={showWishList}
+                    gamePagesWishList={gamePagesWishList}
+                    handleShowWishlist={handleShowWishlist}
                 />
             </div>
             <ListCounter filteredGamePages={filteredGamePages} />
@@ -113,9 +140,12 @@ export const getStaticProps = async () => {
         const sortedGamePages = gamePages.sort((a, b) =>
             a.title.localeCompare(b.title)
         );
+        const sortedGamePagesNotWishlist = sortedGamePages.filter(game => game.wishlist === false);
+        const sortedGamePagesWishlist = sortedGamePages.filter(game => game.wishlist === true);
         return {
             props: {
-                gamePages: sortedGamePages,
+                gamePages: sortedGamePagesNotWishlist,
+                gamePagesWishList: sortedGamePagesWishlist,
             },
             revalidate: 60,
         };
@@ -124,6 +154,7 @@ export const getStaticProps = async () => {
         return {
             props: {
                 gamePages: [],
+                gamePagesWishList: [],
             },
             revalidate: 60,
         };
