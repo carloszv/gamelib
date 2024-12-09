@@ -3,8 +3,8 @@ import { Content } from '../types/contentTypes'; // Import the Content type
 
 // Create a Contentful client
 const client = createClient({
-    space: process.env.CONTENTFUL_SPACE_ID || 'q1j74ir7zza4', // Replace with a valid default if needed
-    accessToken: process.env.CONTENTFUL_ACCESS_TOKEN || 'vjWADSYnRfJWkGWqEsXnd-HbCCs9uJ8NInQQPGJGGqc', // Replace with a valid default if needed
+    space: process.env.CONTENTFUL_SPACE_ID || '', // Replace with a valid default if needed
+    accessToken: process.env.CONTENTFUL_ACCESS_TOKEN || '', // Replace with a valid default if needed
 });
 
 // Function to fetch a single entry by ID

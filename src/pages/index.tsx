@@ -75,6 +75,19 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesWishList }) => 
         loadImages();
     }, [gamePages]);
 
+    // On component mount check wishlist saved value
+    useEffect(() => {
+        const isWishListShown = localStorage.getItem('showWishList');
+        if (isWishListShown === "true" && !showWishList) {
+            handleShowWishlist();
+        }
+    }, []);
+
+    // When wishlist changes
+    useEffect(() => {
+        localStorage.setItem('showWishList', String(showWishList));
+    }, [showWishList]);
+
     const handleSearch = (query: string) => {
         const currentList = showWishList ? gamePagesWishList : gamePages;
         const filtered = currentList.filter(page =>
