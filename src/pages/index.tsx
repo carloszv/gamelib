@@ -136,6 +136,8 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesWishList }) => 
         setFilteredGamePages(filtered);
     };
 
+    console.log();
+
     return (
         <>
             <div 
