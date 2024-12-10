@@ -12,12 +12,26 @@ import WishlistButton from '@/components/WishlistButton';
 import { makeStyles } from '@mui/styles';
 
 const useStyles = makeStyles((theme) => ({
-    loadingSpinner: {
+    fullScreenOverlay: {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'rgba(255, 255, 255)',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        minHeight: '100vh',
-        backgroundColor: '#f0f0f0'
+        zIndex: 9999, // Ensure it's above all other content
+        transition: 'opacity 0.5s ease-out', // Smooth fade-out effect
+    },
+    loadingSpinner: {
+        // Optional: add some styling to make the spinner more prominent
+        transform: 'scale(1.5)', // Make spinner slightly larger
+    },
+    fadeOut: {
+        opacity: 0,
+        pointerEvents: 'none', // Disable interactions when fading out
     },
     page: {
         display: 'flex',
@@ -61,11 +75,14 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesWishList }) => 
     const [showWishList, setShowWishList] = useState<boolean>(false);
 
     useEffect(() => {
-        // Preload images when component mounts or gamePages changes
         const loadImages = async () => {
             try {
                 await preloadImages(gamePages);
-                setImagesLoaded(true);
+                
+                // Add a slight delay to ensure a smooth transition
+                setTimeout(() => {
+                    setImagesLoaded(true);
+                }, 500);
             } catch (error) {
                 console.error('Error preloading images:', error);
                 setImagesLoaded(true);
@@ -119,39 +136,39 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesWishList }) => 
         setFilteredGamePages(filtered);
     };
 
-    // Show loading spinner until images are loaded
-    if (!imagesLoaded) {
-        return (
-            <div className={classes.loadingSpinner}>
+    return (
+        <>
+            <div 
+                className={`${classes.fullScreenOverlay} ${imagesLoaded ? classes.fadeOut : ''}`}
+            >
                 <CircularProgress 
+                    className={classes.loadingSpinner}
                     color="secondary" 
                     size={80} 
                     thickness={4} 
                     variant="indeterminate"
                 />
             </div>
-        );
-    }
 
-    return (
-        <div className={classes.page}>
-            <div className={classes.topBar}>
-                <SearchBar onSearch={handleSearch} />
-                <SearchFilter 
-                    selectedPlatform={selectedPlatform} 
-                    handlePlatformChange={handlePlatformChange} 
-                    PLATFORMS={PLATFORMS} 
-                />
-                <WishlistButton
-                    showWishList={showWishList}
-                    gamePagesWishList={gamePagesWishList}
-                    handleShowWishlist={handleShowWishlist}
-                />
+            <div className={classes.page}>
+                <div className={classes.topBar}>
+                    <SearchBar onSearch={handleSearch} />
+                    <SearchFilter 
+                        selectedPlatform={selectedPlatform} 
+                        handlePlatformChange={handlePlatformChange} 
+                        PLATFORMS={PLATFORMS} 
+                    />
+                    <WishlistButton
+                        showWishList={showWishList}
+                        gamePagesWishList={gamePagesWishList}
+                        handleShowWishlist={handleShowWishlist}
+                    />
+                </div>
+                <ListCounter filteredGamePages={filteredGamePages} />
+                <GameGrid filteredGamePages={filteredGamePages} />
+                <ScrollToTopButton />
             </div>
-            <ListCounter filteredGamePages={filteredGamePages} />
-            <GameGrid filteredGamePages={filteredGamePages} />
-            <ScrollToTopButton />
-        </div>
+        </>
     );
 };
 
