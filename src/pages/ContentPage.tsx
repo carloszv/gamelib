@@ -1,4 +1,5 @@
 import ExternalLinks from '@/components/ExternalLinks';
+import Layout from '@/components/Layout';
 import Video from '@/components/Video';
 import { Content } from '@/types/contentTypes';
 import { convertURL, getRatingStyle } from '@/util/funtions';
@@ -54,7 +55,7 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
     if (!content) return null;
 
     return (
-        <>
+        <Layout title={content.title}>
             <Container maxWidth="md" sx={{ py: 4 }}>
                 {/* Back Button */}
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
@@ -231,7 +232,7 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
                     )}
                 </DialogContent>
             </Dialog>
-        </>
+        </Layout>
     );
 };
 

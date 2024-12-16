@@ -1,4 +1,5 @@
 import { useSearch } from '@/components/contexts/SearchContext';
+import Layout from '@/components/Layout';
 import ListCounter from '@/components/ListCounter';
 import ScrollToTopButton from '@/components/ScrollTotopButton';
 import SearchFilter from '@/components/SearchFilter';
@@ -129,7 +130,7 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesWishList }) => 
     };
 
     return (
-        <>
+        <Layout title="Carlos' GameLib">
             <div 
                 className={`${classes.fullScreenOverlay} ${imagesLoaded ? classes.fadeOut : ''}`}
             >
@@ -156,7 +157,7 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesWishList }) => 
                 <GameGrid filteredGamePages={filteredGamePages} />
                 <ScrollToTopButton />
             </div>
-        </>
+        </Layout>
     );
 };
 
