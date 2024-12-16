@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import {
     FormControl,
@@ -6,7 +7,7 @@ import {
     Select,
     styled
 } from '@mui/material';
-import React, { useState } from 'react';
+import { useSearch } from './contexts/SearchContext';
 
 // Create a styled Select component with explicit cursor styling
 const StyledSelect = styled(Select)({
@@ -17,10 +18,9 @@ const StyledSelect = styled(Select)({
 });
 
 const SearchFilter: React.FC<{
-    selectedPlatform: string,
-    handlePlatformChange: (event: any) => void,
     PLATFORMS: string[]
-}> = ({ selectedPlatform, handlePlatformChange, PLATFORMS }) => {    
+}> = ({ PLATFORMS }) => {    
+    const { selectedPlatform, setSelectedPlatform } = useSearch();
     const [isOpen, setIsOpen] = useState(false);
 
     const handleOpen = () => {
@@ -32,7 +32,7 @@ const SearchFilter: React.FC<{
     };
 
     const handleChange = (event: any) => {
-        handlePlatformChange(event);
+        setSelectedPlatform(event.target.value);
         handleClose();
     }
 

@@ -1,17 +1,16 @@
-import { fetchAllGamePages } from '@/api/api';
+import { useSearch } from '@/components/contexts/SearchContext';
 import ListCounter from '@/components/ListCounter';
 import ScrollToTopButton from '@/components/ScrollTotopButton';
 import SearchFilter from '@/components/SearchFilter';
+import WishlistButton from '@/components/WishlistButton';
 import { PLATFORMS } from '@/util/constants';
-import { CircularProgress, SelectChangeEvent } from '@mui/material';
+import { CircularProgress } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import GameGrid from '../components/GameGrid';
 import SearchBar from '../components/SearchBar';
 import { Content } from '../types/contentTypes';
-import WishlistButton from '@/components/WishlistButton';
-import { makeStyles } from '@mui/styles';
-import { useSearch } from '@/components/contexts/SearchContext';
-import { useRouter } from 'next/router';
 
 const useStyles = makeStyles((theme) => ({
     fullScreenOverlay: {
@@ -24,16 +23,15 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        zIndex: 9999, // Ensure it's above all other content
-        transition: 'opacity 0.5s ease-out', // Smooth fade-out effect
+        zIndex: 9999,
+        transition: 'opacity 0.5s ease-out',
     },
     loadingSpinner: {
-        // Optional: add some styling to make the spinner more prominent
-        transform: 'scale(1.5)', // Make spinner slightly larger
+        transform: 'scale(1.5)',
     },
     fadeOut: {
         opacity: 0,
-        pointerEvents: 'none', // Disable interactions when fading out
+        pointerEvents: 'none',
     },
     page: {
         display: 'flex',
@@ -69,38 +67,20 @@ interface HomePageProps {
 }
 
 const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesWishList }) => {
-    const { searchQuery, setSearchQuery } = useSearch(); // Destructure setSearchQuery
-    const router = useRouter(); // Get router
+    const { 
+        searchQuery, 
+        selectedPlatform, 
+        showWishList, 
+        setShowWishList 
+    } = useSearch();
+    
+    const router = useRouter();
     const classes = useStyles();
 
     const [filteredGamePages, setFilteredGamePages] = useState<Content[]>(gamePages);
-    const [selectedPlatform, setSelectedPlatform] = useState<string>('');
     const [imagesLoaded, setImagesLoaded] = useState<boolean>(false);
-    const [showWishList, setShowWishList] = useState<boolean>(false);
 
-    // When returning to the page, restore the search query from context
-    useEffect(() => {
-        // Check if returning from another page
-        if (router.isReady) {
-        const filtered = gamePages.filter(page =>
-            page.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
-            (selectedPlatform ? page.platform === selectedPlatform : true)
-        );
-        setFilteredGamePages(filtered);
-        }
-    }, [router.isReady, searchQuery, selectedPlatform, gamePages]);
-
-    // Rest of your existing HomePage logic remains the same
-
-    // Optional: Clear search when leaving the page
-    useEffect(() => {
-        return () => {
-        // Uncomment if you want to clear search when leaving the page
-        // setSearchQuery('');
-        };
-    }, []);
-
-
+    // Preload images
     useEffect(() => {
         const loadImages = async () => {
             try {
@@ -119,48 +99,33 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesWishList }) => 
         loadImages();
     }, [gamePages]);
 
-    // On component mount check wishlist saved value
+    // Filtering logic consolidated into one useEffect
     useEffect(() => {
-        const isWishListShown = localStorage.getItem('showWishList');
-        if (isWishListShown === "true" && !showWishList) {
-            handleShowWishlist();
+        if (router.isReady) {
+            // Determine which list to filter
+            const currentList = showWishList ? gamePagesWishList : gamePages;
+            
+            // Apply filters
+            const filtered = currentList.filter(page =>
+                page.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
+                (selectedPlatform ? page.platform === selectedPlatform : true)
+            );
+            
+            setFilteredGamePages(filtered);
         }
-    }, []);
+    }, [
+        router.isReady, 
+        searchQuery, 
+        selectedPlatform, 
+        showWishList, 
+        gamePages, 
+        gamePagesWishList
+    ]);
 
-    // When wishlist changes
-    useEffect(() => {
-        localStorage.setItem('showWishList', String(showWishList));
-    }, [showWishList]);
-
-    const handleSearch = (query: string) => {
-        const currentList = showWishList ? gamePagesWishList : gamePages;
-        const filtered = currentList.filter(page =>
-            page.title.toLowerCase().includes(query.toLowerCase())
-        );
-        setFilteredGamePages(filtered);
-    };
-
-    const handlePlatformChange = (event: SelectChangeEvent<string>) => {
-        const platform = event.target.value as string;
-        setSelectedPlatform(platform);
-        const currentList = showWishList ? gamePagesWishList : gamePages;
-        const filtered = currentList.filter(page =>
-            platform ? page.platform === platform : true
-        );
-        setFilteredGamePages(filtered);
-    };
-
+    // Wishlist toggle handler
     const handleShowWishlist = () => {
         if (gamePagesWishList.length === 0) return;
-
         setShowWishList(!showWishList);
-        
-        const currentList = !showWishList ? gamePagesWishList : gamePages;
-        const filtered = currentList.filter(page =>
-            selectedPlatform ? page.platform === selectedPlatform : true
-        );
-        
-        setFilteredGamePages(filtered);
     };
 
     return (
@@ -179,12 +144,8 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesWishList }) => 
 
             <div className={classes.page}>
                 <div className={classes.topBar}>
-                    <SearchBar onSearch={handleSearch} />
-                    <SearchFilter 
-                        selectedPlatform={selectedPlatform} 
-                        handlePlatformChange={handlePlatformChange} 
-                        PLATFORMS={PLATFORMS} 
-                    />
+                    <SearchBar />
+                    <SearchFilter PLATFORMS={PLATFORMS} />
                     <WishlistButton
                         showWishList={showWishList}
                         gamePagesWishList={gamePagesWishList}

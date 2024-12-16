@@ -4,41 +4,63 @@ import React, { createContext, useState, useContext, ReactNode, useEffect } from
 interface SearchContextType {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
+  selectedPlatform: string;
+  setSelectedPlatform: (platform: string) => void;
+  showWishList: boolean;
+  setShowWishList: (show: boolean) => void;
 }
 
 // Create the context with a default value
 const SearchContext = createContext<SearchContextType>({
   searchQuery: '',
-  setSearchQuery: () => {}
+  setSearchQuery: () => {},
+  selectedPlatform: '',
+  setSelectedPlatform: () => {},
+  showWishList: false,
+  setShowWishList: () => {}
 });
 
 // Create a provider component
 export const SearchProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  // Initialize state from localStorage with safe checks
   const [searchQuery, setSearchQuery] = useState<string>(() => {
-    // Initialize from localStorage if available
     if (typeof window !== 'undefined') {
       return localStorage.getItem('searchQuery') || '';
     }
     return '';
   });
 
-  // Persist search query to localStorage whenever it changes
+  const [selectedPlatform, setSelectedPlatform] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('selectedPlatform') || '';
+    }
+    return '';
+  });
+
+  const [showWishList, setShowWishList] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('showWishList') === 'true';
+    }
+    return false;
+  });
+
+  // Persist to localStorage whenever values change
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('searchQuery', searchQuery);
+      localStorage.setItem('selectedPlatform', selectedPlatform);
+      localStorage.setItem('showWishList', String(showWishList));
     }
-  }, [searchQuery]);
+  }, [searchQuery, selectedPlatform, showWishList]);
 
   return (
     <SearchContext.Provider value={{ 
       searchQuery, 
-      setSearchQuery: (query: string) => {
-        setSearchQuery(query);
-        // Also update localStorage directly
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('searchQuery', query);
-        }
-      } 
+      setSearchQuery,
+      selectedPlatform,
+      setSelectedPlatform,
+      showWishList,
+      setShowWishList
     }}>
       {children}
     </SearchContext.Provider>
