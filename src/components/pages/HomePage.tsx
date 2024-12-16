@@ -9,9 +9,9 @@ import { CircularProgress } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import GameGrid from '../components/GameGrid';
-import SearchBar from '../components/SearchBar';
-import { Content } from '../types/contentTypes';
+import GameGrid from '../GameGrid';
+import SearchBar from '../SearchBar';
+import { Content } from '../../types/contentTypes';
 
 const useStyles = makeStyles((theme) => ({
     fullScreenOverlay: {

@@ -1,8 +1,8 @@
 // [id].tsx
-import { GetStaticProps, GetStaticPaths } from 'next';
-import { fetchEntryById, fetchAllGamePages } from '../../api/api';
+import { GetStaticPaths, GetStaticProps } from 'next';
+import { fetchAllGamePages, fetchEntryById } from '../../api/api';
+import ContentPage from '../../components/pages/ContentPage';
 import { Content } from '../../types/contentTypes';
-import ContentPage from '../ContentPage';
 
 interface Props {
     content: Content | null;
@@ -12,6 +12,11 @@ export default ContentPage;
 
 export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
     try {
+         // Check if params and id exist
+         if (!params || !params.id) {
+            throw new Error("Missing 'id' in getStaticProps");
+        }
+
         const content = await fetchEntryById(params?.id as string);
 
         if (!content) {

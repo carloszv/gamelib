@@ -1,9 +1,9 @@
 import React from 'react';
 
 import { fetchAllGamePages } from '@/api/api';
-import { Content } from '@/types/contentTypes';
 import { SearchProvider } from '@/components/contexts/SearchContext';
-import HomePage from './HomePage';
+import { Content } from '@/types/contentTypes';
+import HomePage from '../components/pages/HomePage';
 
 interface HomeProps {
     gamePages: Content[];
