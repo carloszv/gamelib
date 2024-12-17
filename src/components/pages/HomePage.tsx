@@ -48,15 +48,50 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-// Utility function to preload images
-const preloadImages = (gamePages: Content[]) => {
+// Updated utility function to preload images only if not cached
+const preloadImages = async (gamePages: Content[]) => {
     return Promise.all(
         gamePages.map(page => 
             new Promise<void>((resolve, reject) => {
-                const img = new Image();
-                img.src = page.cover?.fields.file.url || ''; 
-                img.onload = () => resolve();
-                img.onerror = () => resolve(); 
+                const imageUrl = page.cover?.fields.file.url || '';
+                if (!imageUrl) {
+                    resolve();
+                    return;
+                }
+
+                // Check if image is already in browser cache
+                fetch(imageUrl, { method: 'HEAD' })
+                    .then(response => {
+                        if (response.ok) {
+                            // Check if image is cached by attempting to load it
+                            const img = new Image();
+                            img.src = imageUrl;
+                            img.onload = () => {
+                                // If image loads quickly, it's likely cached
+                                resolve();
+                            };
+                            img.onerror = () => {
+                                // If image fails to load, preload it
+                                const preloadImg = new Image();
+                                preloadImg.src = imageUrl;
+                                preloadImg.onload = () => resolve();
+                                preloadImg.onerror = () => resolve();
+                            };
+                        } else {
+                            // If HEAD request fails, proceed with preloading
+                            const img = new Image();
+                            img.src = imageUrl;
+                            img.onload = () => resolve();
+                            img.onerror = () => resolve();
+                        }
+                    })
+                    .catch(() => {
+                        // If fetch fails, attempt to preload
+                        const img = new Image();
+                        img.src = imageUrl;
+                        img.onload = () => resolve();
+                        img.onerror = () => resolve();
+                    });
             })
         )
     );
@@ -86,11 +121,14 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesWishList }) => 
         const loadImages = async () => {
             try {
                 await preloadImages(gamePages);
+                if (gamePagesWishList.length !== 0) {
+                    await preloadImages(gamePagesWishList);
+                };
                 
                 // Add a slight delay to ensure a smooth transition
                 setTimeout(() => {
                     setImagesLoaded(true);
-                }, 500);
+                }, 200);
             } catch (error) {
                 console.error('Error preloading images:', error);
                 setImagesLoaded(true);
