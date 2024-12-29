@@ -9,14 +9,6 @@ import { getRatingStyle } from '@/util/funtions';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 
 const useStyles = makeStyles((theme) => ({
-    cardWrapper: {
-        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-        '&:hover': {
-            transform: 'scale(1.05)',
-            boxShadow: '0 10px 20px rgba(0,0,0,0.2)',
-            zIndex: 10
-        }
-    },
     card: {
         position: 'relative', 
         width: '100%', 
@@ -73,52 +65,51 @@ const useStyles = makeStyles((theme) => ({
 interface CardProps {
     page: Content;
     className?: string;
+    showTitle?: boolean;
 }
 
-const Card: React.FC<CardProps> = ({ page }) => {
+const Card: React.FC<CardProps> = ({ page, showTitle = true }) => {
     const classes = useStyles();
 
     return (
-        <Grid item xs={6} sm={4} md={3} className={classes.cardWrapper}>
-            <Link href={`/content/${page.id}`} passHref style={{ textDecoration: 'none' }}>
-                {page.cover?.fields.file.url ? (
-                    <div className={classes.card}>
-                        <Image
-                            src={convertURL(page.cover.fields.file.url)} 
-                            alt={page.title}
-                            fill
-                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                            style={{ 
-                                objectFit: "fill",
-                                filter: 'brightness(0.9)' // Slightly darken the image
-                            }}
-                            loading="lazy"
-                            priority={false}
-                        />
-                        <div className={classes.imageOverlay}>
-                            {page.rating && (
-                                <div 
-                                    className={classes.ratingCircle} 
-                                    style={{ ...getRatingStyle(page.rating) }}
-                                >
-                                    {page.rating}
-                                </div>
-                            )}
-                            {page.masterpiece && (
-                                <EmojiEventsIcon className={classes.emoji} />
-                            )}
-                        </div>
+        <Link href={`/content/${page.id}`} passHref style={{ textDecoration: 'none' }}>
+            {page.cover?.fields.file.url ? (
+                <div className={classes.card}>
+                    <Image
+                        src={convertURL(page.cover.fields.file.url)} 
+                        alt={page.title}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        style={{ 
+                            objectFit: "fill",
+                            filter: 'brightness(0.9)' // Slightly darken the image
+                        }}
+                        loading="lazy"
+                        priority={false}
+                    />
+                    <div className={classes.imageOverlay}>
+                        {page.rating && (
+                            <div 
+                                className={classes.ratingCircle} 
+                                style={{ ...getRatingStyle(page.rating) }}
+                            >
+                                {page.rating}
+                            </div>
+                        )}
+                        {page.masterpiece && (
+                            <EmojiEventsIcon className={classes.emoji} />
+                        )}
                     </div>
-                ) : null}
-                <Typography 
-                    variant="h6" 
-                    className={classes.title}
-                    color="textPrimary"
-                >
-                    {page.title}
-                </Typography>
-            </Link>
-        </Grid>
+                </div>
+            ) : null}
+            {showTitle && <Typography 
+                variant="h6" 
+                className={classes.title}
+                color="textPrimary"
+            >
+                {page.title}
+            </Typography>}
+        </Link>
     );
 };
 

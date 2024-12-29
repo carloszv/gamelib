@@ -14,15 +14,24 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         justifyContent: 'center',
         flexWrap: 'wrap',
-        gap: '16px',
+        gap: '12px',
+    },
+    cardWrapper: {
+        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+        '&:hover': {
+            transform: 'scale(1.05)',
+            boxShadow: '0 10px 20px rgba(0,0,0,0.2)',
+            zIndex: 10
+        }
     },
 }));
 
 interface GameGridProps {
     filteredGamePages: Content[]; // Props to receive filtered game pages
+    showTitle: boolean;
 }
 
-const GameGrid: React.FC<GameGridProps> = ({ filteredGamePages }) => {
+const GameGrid: React.FC<GameGridProps> = ({ filteredGamePages, showTitle = true }) => {
     const classes = useStyles();
     return (
         <Grid 
@@ -31,7 +40,9 @@ const GameGrid: React.FC<GameGridProps> = ({ filteredGamePages }) => {
         >
             {filteredGamePages.length > 0 ? (
                 filteredGamePages.map((page) => (
-                    <Card page={page} key={page.id} /> // Pass styles as a prop
+                    <Grid key={page.id} item xs={5} sm={4} md={2} className={classes.cardWrapper} >
+                        <Card page={page} showTitle={showTitle} />
+                    </Grid>
                 ))
             ) : (
                 <div className="flex justify-center items-center w-full max-w-full px-4">

@@ -192,7 +192,7 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesWishList }) => 
                     />
                 </div>
                 <ListCounter filteredGamePages={filteredGamePages} />
-                <GameGrid filteredGamePages={filteredGamePages} />
+                <GameGrid filteredGamePages={filteredGamePages} showTitle={false}/>
                 <ScrollToTopButton />
             </div>
         </Layout>
