@@ -166,8 +166,8 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesWishList }) => 
                     (showCompleted && page.rating) || 
                     (showNotCompleted && !page.rating);
                 
-                // Masterpiece filter
-                const matchesMasterpiece = !showMasterpiece || page.masterpiece;
+                // Masterpiece filter - only apply if there are masterpieces in the current view
+                const matchesMasterpiece = masterpieceCount === 0 || !showMasterpiece || page.masterpiece;
                 
                 return matchesSearch && matchesPlatform && matchesCompletion && matchesMasterpiece;
             });
@@ -183,7 +183,8 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesWishList }) => 
         gamePagesWishList,
         showCompleted,
         showNotCompleted,
-        showMasterpiece
+        showMasterpiece,
+        masterpieceCount
     ]);
 
     // Wishlist toggle handler
