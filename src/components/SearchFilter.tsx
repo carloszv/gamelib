@@ -11,29 +11,73 @@ import {
     Divider,
     Box,
     IconButton,
-    styled
+    styled,
+    alpha
 } from '@mui/material';
 import { useSearch } from './contexts/SearchContext';
 
-const StyledMenu = styled(Menu)({
+const StyledMenu = styled(Menu)(({ theme }) => ({
     '& .MuiPaper-root': {
-        width: 250,
+        width: 280,
         maxHeight: 400,
+        borderRadius: 12,
+        boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+        marginTop: 8,
+        '& .MuiList-root': {
+            padding: '8px 0',
+        },
     },
-});
+}));
 
-const FilterGroup = styled(Box)({
-    padding: '8px 16px',
+const FilterGroup = styled(Box)(({ theme }) => ({
+    padding: '12px 16px',
     '&:not(:last-child)': {
-        borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
+        borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
     },
-});
+}));
 
-const FilterTitle = styled(Typography)({
+const FilterTitle = styled(Typography)(({ theme }) => ({
     fontWeight: 600,
-    marginBottom: 8,
-    color: '#666',
-});
+    marginBottom: 12,
+    color: theme.palette.text.secondary,
+    fontSize: '0.875rem',
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px',
+}));
+
+const StyledMenuItem = styled(MenuItem)(({ theme }) => ({
+    padding: '8px 16px',
+    margin: '2px 8px',
+    borderRadius: 8,
+    '&:hover': {
+        backgroundColor: alpha(theme.palette.primary.main, 0.08),
+    },
+    '&.Mui-selected': {
+        backgroundColor: alpha(theme.palette.primary.main, 0.12),
+        '&:hover': {
+            backgroundColor: alpha(theme.palette.primary.main, 0.16),
+        },
+    },
+}));
+
+const StyledCheckbox = styled(Checkbox)(({ theme }) => ({
+    padding: 8,
+    '&.Mui-checked': {
+        color: theme.palette.primary.main,
+    },
+}));
+
+const FilterButton = styled(IconButton)(({ theme }) => ({
+    width: 40,
+    height: 40,
+    marginLeft: 10,
+    backgroundColor: alpha(theme.palette.primary.main, 0.08),
+    color: theme.palette.primary.main,
+    '&:hover': {
+        backgroundColor: alpha(theme.palette.primary.main, 0.12),
+    },
+    transition: 'all 0.2s ease-in-out',
+}));
 
 interface SearchFilterProps {
     PLATFORMS: string[];
@@ -110,60 +154,101 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ PLATFORMS, masterpieceCount
 
     return (
         <>
-            <IconButton
+            <FilterButton
                 onClick={handleClick}
-                style={{ marginLeft: 10 }}
-                color="primary"
+                size="small"
             >
                 <FilterListIcon />
-            </IconButton>
+            </FilterButton>
             <StyledMenu
                 anchorEl={anchorEl}
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                }}
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                }}
             >
                 <FilterGroup>
                     <FilterTitle variant="subtitle2">Console Type</FilterTitle>
                     {PLATFORMS.map((platform) => (
-                        <MenuItem key={platform} onClick={() => handlePlatformChange(platform)}>
-                            <Checkbox
+                        <StyledMenuItem 
+                            key={platform} 
+                            onClick={() => handlePlatformChange(platform)}
+                            selected={selectedPlatforms.includes(platform)}
+                        >
+                            <StyledCheckbox
                                 checked={selectedPlatforms.includes(platform)}
                                 size="small"
                             />
-                            <ListItemText primary={platform} />
-                        </MenuItem>
+                            <ListItemText 
+                                primary={platform}
+                                primaryTypographyProps={{
+                                    fontSize: '0.875rem',
+                                    fontWeight: selectedPlatforms.includes(platform) ? 600 : 400,
+                                }}
+                            />
+                        </StyledMenuItem>
                     ))}
                 </FilterGroup>
 
                 <FilterGroup>
                     <FilterTitle variant="subtitle2">More</FilterTitle>
-                    <MenuItem onClick={() => handleCompletionChange(true)}>
-                        <Checkbox
+                    <StyledMenuItem 
+                        onClick={() => handleCompletionChange(true)}
+                        selected={showCompleted}
+                    >
+                        <StyledCheckbox
                             checked={showCompleted}
                             size="small"
                         />
-                        <ListItemText primary="Completed" />
-                    </MenuItem>
-                    <MenuItem onClick={() => handleCompletionChange(false)}>
-                        <Checkbox
+                        <ListItemText 
+                            primary="Completed"
+                            primaryTypographyProps={{
+                                fontSize: '0.875rem',
+                                fontWeight: showCompleted ? 600 : 400,
+                            }}
+                        />
+                    </StyledMenuItem>
+                    <StyledMenuItem 
+                        onClick={() => handleCompletionChange(false)}
+                        selected={showNotCompleted}
+                    >
+                        <StyledCheckbox
                             checked={showNotCompleted}
                             size="small"
                         />
-                        <ListItemText primary="Not Completed" />
-                    </MenuItem>
-                    <MenuItem 
+                        <ListItemText 
+                            primary="Not Completed"
+                            primaryTypographyProps={{
+                                fontSize: '0.875rem',
+                                fontWeight: showNotCompleted ? 600 : 400,
+                            }}
+                        />
+                    </StyledMenuItem>
+                    <StyledMenuItem 
                         onClick={() => masterpieceCount > 0 && setShowMasterpiece(!showMasterpiece)}
                         disabled={masterpieceCount === 0}
+                        selected={showMasterpiece}
                     >
-                        <Checkbox
+                        <StyledCheckbox
                             checked={showMasterpiece}
                             size="small"
                             disabled={masterpieceCount === 0}
                         />
                         <ListItemText 
-                            primary={`Masterpiece${masterpieceCount > 0 ? ` (${masterpieceCount})` : ''}`} 
+                            primary={`Masterpiece${masterpieceCount > 0 ? ` (${masterpieceCount})` : ''}`}
+                            primaryTypographyProps={{
+                                fontSize: '0.875rem',
+                                fontWeight: showMasterpiece ? 600 : 400,
+                                color: masterpieceCount === 0 ? 'text.disabled' : 'text.primary',
+                            }}
                         />
-                    </MenuItem>
+                    </StyledMenuItem>
                 </FilterGroup>
             </StyledMenu>
         </>
