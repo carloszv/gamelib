@@ -66,10 +66,13 @@ interface CardProps {
     page: Content;
     className?: string;
     showTitle?: boolean;
+    index?: number; // Add index prop to determine if image is above the fold
 }
 
-const Card: React.FC<CardProps> = ({ page, showTitle = true }) => {
+const Card: React.FC<CardProps> = ({ page, showTitle = true, index = 0 }) => {
     const classes = useStyles();
+    // Consider first 6 images as above the fold (adjust this number based on your layout)
+    const isAboveFold = index < 6;
 
     return (
         <Link href={`/content/${page.id}`} passHref style={{ textDecoration: 'none' }}>
@@ -84,8 +87,8 @@ const Card: React.FC<CardProps> = ({ page, showTitle = true }) => {
                             objectFit: "fill",
                             filter: 'brightness(0.9)' // Slightly darken the image
                         }}
-                        loading="lazy"
-                        priority={false}
+                        loading={isAboveFold ? "eager" : "lazy"}
+                        priority={isAboveFold}
                     />
                     <div className={classes.imageOverlay}>
                         {page.rating && (

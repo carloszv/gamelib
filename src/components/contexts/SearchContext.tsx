@@ -22,36 +22,32 @@ const SearchContext = createContext<SearchContextType>({
 
 // Create a provider component
 export const SearchProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // Initialize state from localStorage with safe checks
-  const [searchQuery, setSearchQuery] = useState<string>(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('searchQuery') || '';
-    }
-    return '';
-  });
+  // Initialize state with default values
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedPlatform, setSelectedPlatform] = useState<string>('');
+  const [showWishList, setShowWishList] = useState<boolean>(false);
+  const [isHydrated, setIsHydrated] = useState<boolean>(false);
 
-  const [selectedPlatform, setSelectedPlatform] = useState<string>(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('selectedPlatform') || '';
-    }
-    return '';
-  });
+  // Load from localStorage after mount
+  useEffect(() => {
+    const storedSearchQuery = localStorage.getItem('searchQuery') || '';
+    const storedPlatform = localStorage.getItem('selectedPlatform') || '';
+    const storedShowWishList = localStorage.getItem('showWishList') === 'true';
 
-  const [showWishList, setShowWishList] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('showWishList') === 'true';
-    }
-    return false;
-  });
+    setSearchQuery(storedSearchQuery);
+    setSelectedPlatform(storedPlatform);
+    setShowWishList(storedShowWishList);
+    setIsHydrated(true);
+  }, []);
 
   // Persist to localStorage whenever values change
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (isHydrated) {
       localStorage.setItem('searchQuery', searchQuery);
       localStorage.setItem('selectedPlatform', selectedPlatform);
       localStorage.setItem('showWishList', String(showWishList));
     }
-  }, [searchQuery, selectedPlatform, showWishList]);
+  }, [searchQuery, selectedPlatform, showWishList, isHydrated]);
 
   return (
     <SearchContext.Provider value={{ 

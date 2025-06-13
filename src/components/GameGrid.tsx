@@ -39,9 +39,9 @@ const GameGrid: React.FC<GameGridProps> = ({ filteredGamePages, showTitle = true
             className={classes.gridContainer}
         >
             {filteredGamePages.length > 0 ? (
-                filteredGamePages.map((page) => (
+                filteredGamePages.map((page, index) => (
                     <Grid key={page.id} item xs={5.5} sm={4} md={2} className={classes.cardWrapper} >
-                        <Card page={page} showTitle={showTitle} />
+                        <Card page={page} showTitle={showTitle} index={index} />
                     </Grid>
                 ))
             ) : (
