@@ -105,9 +105,12 @@ interface HomePageProps {
 const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesWishList }) => {
     const { 
         searchQuery, 
-        selectedPlatform, 
+        selectedPlatforms, 
         showWishList, 
-        setShowWishList 
+        setShowWishList,
+        showCompleted,
+        showNotCompleted,
+        showMasterpiece
     } = useSearch();
     
     const router = useRouter();
@@ -115,6 +118,12 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesWishList }) => 
 
     const [filteredGamePages, setFilteredGamePages] = useState<Content[]>(gamePages);
     const [imagesLoaded, setImagesLoaded] = useState<boolean>(false);
+
+    // Count masterpieces in the current list
+    const masterpieceCount = React.useMemo(() => {
+        const currentList = showWishList ? gamePagesWishList : gamePages;
+        return currentList.filter(page => page.masterpiece).length;
+    }, [gamePages, gamePagesWishList, showWishList]);
 
     // Preload images
     useEffect(() => {
@@ -145,20 +154,36 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesWishList }) => 
             const currentList = showWishList ? gamePagesWishList : gamePages;
             
             // Apply filters
-            const filtered = currentList.filter(page =>
-                page.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
-                (selectedPlatform ? page.platform === selectedPlatform : true)
-            );
+            const filtered = currentList.filter(page => {
+                // Text search filter
+                const matchesSearch = page.title.toLowerCase().includes(searchQuery.toLowerCase());
+                
+                // Platform filter
+                const matchesPlatform = page.platform ? selectedPlatforms.includes(page.platform) : false;
+                
+                // Completion status filter
+                const matchesCompletion = 
+                    (showCompleted && page.rating) || 
+                    (showNotCompleted && !page.rating);
+                
+                // Masterpiece filter
+                const matchesMasterpiece = !showMasterpiece || page.masterpiece;
+                
+                return matchesSearch && matchesPlatform && matchesCompletion && matchesMasterpiece;
+            });
             
             setFilteredGamePages(filtered);
         }
     }, [
         router.isReady, 
         searchQuery, 
-        selectedPlatform, 
+        selectedPlatforms, 
         showWishList, 
         gamePages, 
-        gamePagesWishList
+        gamePagesWishList,
+        showCompleted,
+        showNotCompleted,
+        showMasterpiece
     ]);
 
     // Wishlist toggle handler
@@ -184,7 +209,10 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesWishList }) => 
             <div className={classes.page}>
                 <div className={classes.topBar}>
                     <SearchBar />
-                    <SearchFilter PLATFORMS={PLATFORMS} />
+                    <SearchFilter 
+                        PLATFORMS={PLATFORMS} 
+                        masterpieceCount={masterpieceCount}
+                    />
                     <WishlistButton
                         showWishList={showWishList}
                         gamePagesWishList={gamePagesWishList}
