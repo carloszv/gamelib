@@ -233,10 +233,10 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ PLATFORMS, masterpieceCount
                     <StyledMenuItem 
                         onClick={() => masterpieceCount > 0 && setShowMasterpiece(!showMasterpiece)}
                         disabled={masterpieceCount === 0}
-                        selected={showMasterpiece}
+                        selected={masterpieceCount > 0 && showMasterpiece}
                     >
                         <StyledCheckbox
-                            checked={showMasterpiece}
+                            checked={masterpieceCount > 0 && showMasterpiece}
                             size="small"
                             disabled={masterpieceCount === 0}
                         />
@@ -244,7 +244,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ PLATFORMS, masterpieceCount
                             primary={`Masterpiece${masterpieceCount > 0 ? ` (${masterpieceCount})` : ''}`}
                             primaryTypographyProps={{
                                 fontSize: '0.875rem',
-                                fontWeight: showMasterpiece ? 600 : 400,
+                                fontWeight: masterpieceCount > 0 && showMasterpiece ? 600 : 400,
                                 color: masterpieceCount === 0 ? 'text.disabled' : 'text.primary',
                             }}
                         />
