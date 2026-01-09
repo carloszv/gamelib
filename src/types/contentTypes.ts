@@ -31,7 +31,7 @@ export interface Content {
     rating?: number;
     masterpiece?: boolean;
     id?: string; // Custom ID field
-    wishlist: boolean;
+    category?: 'Collection' | 'Wishlist' | 'Game'; // Category field from Contentful (defaults to 'collection' if not set)
     videoReview?: string;
     externalLink1?: string;
     externalLink2?: string;

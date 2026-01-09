@@ -1,13 +1,15 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 
+export type ViewMode = 'collection' | 'wishlist' | 'completed';
+
 // Define the shape of the context
 interface SearchContextType {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   selectedPlatforms: string[];
   setSelectedPlatforms: (platforms: string[]) => void;
-  showWishList: boolean;
-  setShowWishList: (show: boolean) => void;
+  viewMode: ViewMode;
+  setViewMode: (mode: ViewMode) => void;
   showCompleted: boolean;
   setShowCompleted: (show: boolean) => void;
   showNotCompleted: boolean;
@@ -22,8 +24,8 @@ const SearchContext = createContext<SearchContextType>({
   setSearchQuery: () => {},
   selectedPlatforms: [],
   setSelectedPlatforms: () => {},
-  showWishList: false,
-  setShowWishList: () => {},
+  viewMode: 'collection',
+  setViewMode: () => {},
   showCompleted: true,
   setShowCompleted: () => {},
   showNotCompleted: true,
@@ -37,7 +39,7 @@ export const SearchProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   // Initialize state with default values
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
-  const [showWishList, setShowWishList] = useState<boolean>(false);
+  const [viewMode, setViewMode] = useState<ViewMode>('collection');
   const [showCompleted, setShowCompleted] = useState<boolean>(true);
   const [showNotCompleted, setShowNotCompleted] = useState<boolean>(true);
   const [showMasterpiece, setShowMasterpiece] = useState<boolean>(true);
@@ -47,14 +49,14 @@ export const SearchProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   useEffect(() => {
     const storedSearchQuery = localStorage.getItem('searchQuery') || '';
     const storedPlatforms = JSON.parse(localStorage.getItem('selectedPlatforms') || '[]');
-    const storedShowWishList = localStorage.getItem('showWishList') === 'true';
+    const storedViewMode = (localStorage.getItem('viewMode') || 'collection') as ViewMode;
     const storedShowCompleted = localStorage.getItem('showCompleted') !== 'false';
     const storedShowNotCompleted = localStorage.getItem('showNotCompleted') !== 'false';
     const storedShowMasterpiece = localStorage.getItem('showMasterpiece') !== 'false';
 
     setSearchQuery(storedSearchQuery);
     setSelectedPlatforms(storedPlatforms);
-    setShowWishList(storedShowWishList);
+    setViewMode(storedViewMode);
     setShowCompleted(storedShowCompleted);
     setShowNotCompleted(storedShowNotCompleted);
     setShowMasterpiece(storedShowMasterpiece);
@@ -66,7 +68,7 @@ export const SearchProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     if (isHydrated) {
       localStorage.setItem('searchQuery', searchQuery);
       localStorage.setItem('selectedPlatforms', JSON.stringify(selectedPlatforms));
-      localStorage.setItem('showWishList', String(showWishList));
+      localStorage.setItem('viewMode', viewMode);
       localStorage.setItem('showCompleted', String(showCompleted));
       localStorage.setItem('showNotCompleted', String(showNotCompleted));
       localStorage.setItem('showMasterpiece', String(showMasterpiece));
@@ -74,7 +76,7 @@ export const SearchProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   }, [
     searchQuery,
     selectedPlatforms,
-    showWishList,
+    viewMode,
     showCompleted,
     showNotCompleted,
     showMasterpiece,
@@ -87,8 +89,8 @@ export const SearchProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       setSearchQuery,
       selectedPlatforms,
       setSelectedPlatforms,
-      showWishList,
-      setShowWishList,
+      viewMode,
+      setViewMode,
       showCompleted,
       setShowCompleted,
       showNotCompleted,

@@ -3,7 +3,7 @@ import Layout from '@/components/Layout';
 import ListCounter from '@/components/ListCounter';
 import ScrollToTopButton from '@/components/ScrollTotopButton';
 import SearchFilter from '@/components/SearchFilter';
-import WishlistButton from '@/components/WishlistButton';
+import MenuButton from '@/components/MenuButton';
 import { PLATFORMS } from '@/util/constants';
 import { CircularProgress } from '@mui/material';
 import { makeStyles } from '@mui/styles';
@@ -99,15 +99,17 @@ const preloadImages = async (gamePages: Content[]) => {
 
 interface HomePageProps {
     gamePages: Content[];
+    gamePagesCollection: Content[];
     gamePagesWishList: Content[];
+    gamePagesCompleted: Content[];
 }
 
-const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesWishList }) => {
+const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesCollection, gamePagesWishList, gamePagesCompleted }) => {
     const { 
         searchQuery, 
         selectedPlatforms, 
-        showWishList, 
-        setShowWishList,
+        viewMode,
+        setViewMode,
         showCompleted,
         showNotCompleted,
         showMasterpiece
@@ -116,22 +118,42 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesWishList }) => 
     const router = useRouter();
     const classes = useStyles();
 
-    const [filteredGamePages, setFilteredGamePages] = useState<Content[]>(gamePages);
+    const [filteredGamePages, setFilteredGamePages] = useState<Content[]>(gamePagesCollection);
     const [imagesLoaded, setImagesLoaded] = useState<boolean>(false);
+
+    // Get the current list based on view mode
+    const currentList = React.useMemo(() => {
+        switch (viewMode) {
+            case 'wishlist':
+                return gamePagesWishList;
+            case 'completed':
+                return gamePagesCompleted;
+            case 'collection':
+            default:
+                return gamePagesCollection;
+        }
+    }, [viewMode, gamePagesCollection, gamePagesWishList, gamePagesCompleted]);
 
     // Count masterpieces in the current list
     const masterpieceCount = React.useMemo(() => {
-        const currentList = showWishList ? gamePagesWishList : gamePages;
         return currentList.filter(page => page.masterpiece).length;
-    }, [gamePages, gamePagesWishList, showWishList]);
+    }, [currentList]);
+
+    // Calculate counts for menu
+    const collectionCount = gamePagesCollection.length;
+    const wishlistCount = gamePagesWishList.length;
+    const completedCount = gamePagesCompleted.length;
 
     // Preload images
     useEffect(() => {
         const loadImages = async () => {
             try {
-                await preloadImages(gamePages);
+                await preloadImages(gamePagesCollection);
                 if (gamePagesWishList.length !== 0) {
                     await preloadImages(gamePagesWishList);
+                };
+                if (gamePagesCompleted.length !== 0) {
+                    await preloadImages(gamePagesCompleted);
                 };
                 
                 // Add a slight delay to ensure a smooth transition
@@ -145,14 +167,11 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesWishList }) => 
         };
 
         loadImages();
-    }, [gamePages]);
+    }, [gamePagesCollection, gamePagesWishList, gamePagesCompleted]);
 
     // Filtering logic consolidated into one useEffect
     useEffect(() => {
         if (router.isReady) {
-            // Determine which list to filter
-            const currentList = showWishList ? gamePagesWishList : gamePages;
-            
             // Apply filters
             const filtered = currentList.filter(page => {
                 // Text search filter
@@ -178,20 +197,13 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesWishList }) => 
         router.isReady, 
         searchQuery, 
         selectedPlatforms, 
-        showWishList, 
-        gamePages, 
-        gamePagesWishList,
+        viewMode,
+        currentList,
         showCompleted,
         showNotCompleted,
         showMasterpiece,
         masterpieceCount
     ]);
-
-    // Wishlist toggle handler
-    const handleShowWishlist = () => {
-        if (gamePagesWishList.length === 0) return;
-        setShowWishList(!showWishList);
-    };
 
     return (
         <Layout title="Carlos' GameLib">
@@ -214,10 +226,12 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesWishList }) => 
                         PLATFORMS={PLATFORMS} 
                         masterpieceCount={masterpieceCount}
                     />
-                    <WishlistButton
-                        showWishList={showWishList}
-                        gamePagesWishList={gamePagesWishList}
-                        handleShowWishlist={handleShowWishlist}
+                    <MenuButton
+                        viewMode={viewMode}
+                        onViewModeChange={setViewMode}
+                        collectionCount={collectionCount}
+                        wishlistCount={wishlistCount}
+                        completedCount={completedCount}
                     />
                 </div>
                 <ListCounter filteredGamePages={filteredGamePages} />
