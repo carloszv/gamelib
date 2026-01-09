@@ -29,30 +29,39 @@ const Home: React.FC<HomeProps> = ({ gamePages, gamePagesCollection, gamePagesWi
 export const getStaticProps = async () => {
     try {
         const gamePages = await fetchAllGamePages();
-        const sortedGamePages = gamePages.sort((a, b) =>
-            a.title.localeCompare(b.title)
-        );
+        
+        // Helper function for consistent sorting
+        const sortByTitle = (a: Content, b: Content) => 
+            a.title.trim().localeCompare(b.title.trim(), undefined, { 
+                sensitivity: 'base',
+                numeric: true 
+            });
         
         // Filter by category field from Contentful
         // If category is not set, default to 'collection'
-        const gamePagesCollection = sortedGamePages.filter(game => 
-            game.category === 'Collection' || !game.category
-        );
-        const gamePagesWishList = sortedGamePages.filter(game => 
-            game.category === 'Wishlist'
-        );
+        const gamePagesCollection = gamePages
+            .filter(game => game.category === 'Collection' || !game.category)
+            .sort(sortByTitle);
+        const gamePagesWishList = gamePages
+            .filter(game => game.category === 'Wishlist')
+            .sort(sortByTitle);
         
         // Played Games: Games with category === 'game' OR games from collection/wishlist that have a rating
-        const gamePagesCompleted = sortedGamePages.filter(game => {
-            // Games with category === 'game'
-            if (game.category === 'Game') {
-                return true;
-            }
-            // Games from collection or wishlist that have a rating/score
-            const isInCollection = game.category === 'Collection' || !game.category;
-            const isInWishlist = game.category === 'Wishlist';
-            return (isInCollection || isInWishlist) && game.rating !== undefined;
-        });
+        const gamePagesCompleted = gamePages
+            .filter(game => {
+                // Games with category === 'game'
+                if (game.category === 'Game') {
+                    return true;
+                }
+                // Games from collection or wishlist that have a rating/score
+                const isInCollection = game.category === 'Collection' || !game.category;
+                const isInWishlist = game.category === 'Wishlist';
+                return (isInCollection || isInWishlist) && game.rating !== undefined;
+            })
+            .sort(sortByTitle);
+        
+        // Keep sorted for backward compatibility
+        const sortedGamePages = gamePages.sort(sortByTitle);
         
         return {
             props: {
