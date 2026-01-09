@@ -145,12 +145,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ PLATFORMS, masterpieceCount
         }
     };
 
-    // Initialize platforms if none are selected
-    React.useEffect(() => {
-        if (selectedPlatforms.length === 0) {
-            setSelectedPlatforms(PLATFORMS);
-        }
-    }, [PLATFORMS, selectedPlatforms.length, setSelectedPlatforms]);
+    // Note: Platform initialization is now handled in SearchContext with default values
 
     return (
         <>

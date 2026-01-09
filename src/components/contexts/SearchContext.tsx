@@ -42,17 +42,22 @@ export const SearchProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const [viewMode, setViewMode] = useState<ViewMode>('collection');
   const [showCompleted, setShowCompleted] = useState<boolean>(true);
   const [showNotCompleted, setShowNotCompleted] = useState<boolean>(true);
-  const [showMasterpiece, setShowMasterpiece] = useState<boolean>(true);
+  const [showMasterpiece, setShowMasterpiece] = useState<boolean>(false);
   const [isHydrated, setIsHydrated] = useState<boolean>(false);
 
   // Load from localStorage after mount
   useEffect(() => {
     const storedSearchQuery = localStorage.getItem('searchQuery') || '';
-    const storedPlatforms = JSON.parse(localStorage.getItem('selectedPlatforms') || '[]');
+    const storedPlatformsJson = localStorage.getItem('selectedPlatforms');
+    // Default to PlayStation 4 and PlayStation 5 if no stored value exists
+    const defaultPlatforms = ['PlayStation 4', 'PlayStation 5'];
+    const storedPlatforms = storedPlatformsJson 
+      ? JSON.parse(storedPlatformsJson)
+      : defaultPlatforms;
     const storedViewMode = (localStorage.getItem('viewMode') || 'collection') as ViewMode;
     const storedShowCompleted = localStorage.getItem('showCompleted') !== 'false';
     const storedShowNotCompleted = localStorage.getItem('showNotCompleted') !== 'false';
-    const storedShowMasterpiece = localStorage.getItem('showMasterpiece') !== 'false';
+    const storedShowMasterpiece = localStorage.getItem('showMasterpiece') === 'true';
 
     setSearchQuery(storedSearchQuery);
     setSelectedPlatforms(storedPlatforms);
