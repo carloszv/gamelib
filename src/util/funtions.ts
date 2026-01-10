@@ -17,3 +17,24 @@ export const getRatingStyle = (rating: number) => {
     }
     return { backgroundColor };
 };
+
+// Convert title to URL-friendly slug
+export const titleToSlug = (title: string): string => {
+    return title
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, '') // Remove special characters
+        .replace(/\s+/g, '-') // Replace spaces with hyphens
+        .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+        .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
+};
+
+// Convert slug back to title (for finding games)
+// Note: This is approximate since we can't perfectly reverse the slug
+// We'll need to match by comparing slugs
+export const slugToTitle = (slug: string): string => {
+    return slug
+        .split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+};

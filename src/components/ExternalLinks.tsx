@@ -1,7 +1,6 @@
 import React from 'react';
 import { Box, Card, CardContent, Typography, styled, alpha } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import Image from 'next/image';
 
 type ExternalLinksProps = {
     externalLinks?: Array<string | undefined>
@@ -16,9 +15,18 @@ interface LinkPreview {
 
 const extractDomain = (url: string): string => {
     try {
-        const parsedUrl = new URL(url);
+        // Ensure URL has protocol for URL constructor
+        const urlWithProtocol = url.startsWith('http://') || url.startsWith('https://') 
+            ? url 
+            : `https://${url}`;
+        const parsedUrl = new URL(urlWithProtocol);
         return parsedUrl.hostname.replace(/^www\./, '');
     } catch (error) {
+        // Fallback: try to extract domain manually
+        const match = url.match(/https?:\/\/(?:www\.)?([^\/]+)/);
+        if (match) {
+            return match[1].replace(/^www\./, '');
+        }
         return 'external-link.com';
     }
 };
@@ -34,7 +42,11 @@ const getFaviconUrl = (url: string): string => {
 
 const getLinkTitle = (url: string): string => {
     try {
-        const parsedUrl = new URL(url);
+        // Ensure URL has protocol for URL constructor
+        const urlWithProtocol = url.startsWith('http://') || url.startsWith('https://') 
+            ? url 
+            : `https://${url}`;
+        const parsedUrl = new URL(urlWithProtocol);
         const hostname = parsedUrl.hostname.replace(/^www\./, '');
         const parts = hostname.split('.');
         if (parts.length >= 2) {
@@ -43,6 +55,17 @@ const getLinkTitle = (url: string): string => {
         }
         return hostname;
     } catch (error) {
+        // Fallback: try to extract domain manually
+        const match = url.match(/https?:\/\/(?:www\.)?([^\/]+)/);
+        if (match) {
+            const hostname = match[1].replace(/^www\./, '');
+            const parts = hostname.split('.');
+            if (parts.length >= 2) {
+                return parts[parts.length - 2].charAt(0).toUpperCase() + 
+                       parts[parts.length - 2].slice(1);
+            }
+            return hostname;
+        }
         return 'External Link';
     }
 };
@@ -81,17 +104,31 @@ const ExternalLinks = ({ externalLinks }: ExternalLinksProps) => {
     const links = externalLinks?.filter(Boolean);
 
     // Compute previews synchronously to avoid hydration mismatch
+    // Ensure consistent results on both server and client
     const linkPreviews: LinkPreview[] = React.useMemo(() => {
         if (!links || links.length === 0) return [];
-        return links.map((link) => ({
-            url: link!,
-            domain: extractDomain(link!),
-            favicon: getFaviconUrl(link!),
-            title: getLinkTitle(link!),
-        }));
+        return links.map((link) => {
+            if (!link) return null;
+            try {
+                return {
+                    url: link,
+                    domain: extractDomain(link),
+                    favicon: getFaviconUrl(link),
+                    title: getLinkTitle(link),
+                };
+            } catch (error) {
+                // Fallback for any parsing errors
+                return {
+                    url: link,
+                    domain: 'external-link.com',
+                    favicon: '/default-favicon.png',
+                    title: 'External Link',
+                };
+            }
+        }).filter((preview): preview is LinkPreview => preview !== null);
     }, [links]);
 
-    if (!links || links.length === 0) return null;
+    if (!links || links.length === 0 || linkPreviews.length === 0) return null;
 
     return (
         <Box sx={{ 
@@ -134,15 +171,15 @@ const ExternalLinks = ({ externalLinks }: ExternalLinksProps) => {
                             }}
                         >
                             <FaviconContainer>
-                                <Image
+                                <img
                                     src={preview.favicon}
                                     alt={preview.title}
-                                    width={32}
-                                    height={32}
                                     style={{
+                                        width: 32,
+                                        height: 32,
                                         objectFit: 'contain',
                                     }}
-                                    onError={(e) => {
+                                    onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
                                         // Fallback to a default icon if favicon fails to load
                                         e.currentTarget.style.display = 'none';
                                     }}

@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Content } from '../types/contentTypes';
-import { convertURL } from '@/util/funtions';
+import { convertURL, titleToSlug } from '@/util/funtions';
 import { makeStyles } from '@mui/styles';
-import { Grid, Typography } from '@mui/material';
+import { Grid, Typography, Box } from '@mui/material';
 import { getRatingStyle } from '@/util/funtions';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 
@@ -71,25 +71,45 @@ interface CardProps {
 
 const Card: React.FC<CardProps> = ({ page, showTitle = true, index = 0 }) => {
     const classes = useStyles();
+    const [imageError, setImageError] = useState(false);
     // Consider first 6 images as above the fold (adjust this number based on your layout)
     const isAboveFold = index < 6;
 
     return (
-        <Link href={`/content/${page.id}`} passHref style={{ textDecoration: 'none' }}>
+        <Link href={`/game/${titleToSlug(page.title)}`} passHref style={{ textDecoration: 'none' }}>
             {page.cover?.fields.file.url ? (
                 <div className={classes.card}>
-                    <Image
-                        src={convertURL(page.cover.fields.file.url)} 
-                        alt={page.title}
-                        fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        style={{ 
-                            objectFit: "fill",
-                            filter: 'brightness(0.9)' // Slightly darken the image
-                        }}
-                        loading={isAboveFold ? "eager" : "lazy"}
-                        priority={isAboveFold}
-                    />
+                    {!imageError ? (
+                        <Image
+                            src={convertURL(page.cover.fields.file.url)} 
+                            alt={page.title}
+                            fill
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            style={{ 
+                                objectFit: "fill",
+                                filter: 'brightness(0.9)' // Slightly darken the image
+                            }}
+                            loading={isAboveFold ? "eager" : "lazy"}
+                            priority={isAboveFold}
+                            onError={() => setImageError(true)}
+                        />
+                    ) : (
+                        <Box
+                            sx={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                backgroundColor: '#e0e0e0',
+                                backgroundImage: `
+                                    repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,.1) 10px, rgba(255,255,255,.1) 20px),
+                                    repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(255,255,255,.1) 10px, rgba(255,255,255,.1) 20px)
+                                `,
+                                filter: 'blur(20px)',
+                            }}
+                        />
+                    )}
                     <div className={classes.imageOverlay}>
                         {page.rating && (
                             <div 
