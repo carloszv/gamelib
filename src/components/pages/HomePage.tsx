@@ -18,14 +18,17 @@ const useStyles = makeStyles((theme) => ({
         position: 'fixed',
         top: 0,
         left: 0,
-        width: '100%',
-        height: '100%',
+        width: '100vw',
+        height: '100vh',
         backgroundColor: 'rgba(255, 255, 255)',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        zIndex: 9999,
-        transition: 'opacity 0.5s ease-out',
+        zIndex: 99999,
+        transition: 'opacity 0.5s ease-out, visibility 0.5s ease-out',
+        visibility: 'visible',
+        overflow: 'hidden',
+        touchAction: 'none', // Prevent scrolling on mobile
     },
     loadingSpinner: {
         transform: 'scale(1.5)',
@@ -33,6 +36,7 @@ const useStyles = makeStyles((theme) => ({
     fadeOut: {
         opacity: 0,
         pointerEvents: 'none',
+        visibility: 'hidden',
     },
     page: {
         display: 'flex',
@@ -144,8 +148,15 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesCollection, gam
     const wishlistCount = gamePagesWishList.length;
     const completedCount = gamePagesCompleted.length;
 
-    // Preload images
+    // Preload images and prevent body scroll while loading
     useEffect(() => {
+        // Prevent body scroll while loading
+        const originalOverflow = document.body.style.overflow;
+        const originalPosition = document.body.style.position;
+        document.body.style.overflow = 'hidden';
+        document.body.style.position = 'fixed';
+        document.body.style.width = '100%';
+
         const loadImages = async () => {
             try {
                 await preloadImages(gamePagesCollection);
@@ -159,14 +170,29 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesCollection, gam
                 // Add a slight delay to ensure a smooth transition
                 setTimeout(() => {
                     setImagesLoaded(true);
+                    // Restore body scroll
+                    document.body.style.overflow = originalOverflow;
+                    document.body.style.position = originalPosition;
+                    document.body.style.width = '';
                 }, 200);
             } catch (error) {
                 console.error('Error preloading images:', error);
                 setImagesLoaded(true);
+                // Restore body scroll on error
+                document.body.style.overflow = originalOverflow;
+                document.body.style.position = originalPosition;
+                document.body.style.width = '';
             }
         };
 
         loadImages();
+
+        // Cleanup function to restore scroll if component unmounts
+        return () => {
+            document.body.style.overflow = originalOverflow;
+            document.body.style.position = originalPosition;
+            document.body.style.width = '';
+        };
     }, [gamePagesCollection, gamePagesWishList, gamePagesCompleted]);
 
     // Filtering logic consolidated into one useEffect
