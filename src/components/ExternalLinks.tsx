@@ -1,73 +1,194 @@
 import React from 'react';
-import { Box, Link, styled } from '@mui/material';
+import { Box, Card, CardContent, Typography, styled, alpha } from '@mui/material';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import Image from 'next/image';
 
 type ExternalLinksProps = {
     externalLinks?: Array<string | undefined>
 }
 
-const extractLinkName = (url: string) => {
+interface LinkPreview {
+    url: string;
+    domain: string;
+    favicon: string;
+    title: string;
+}
+
+const extractDomain = (url: string): string => {
+    try {
+        const parsedUrl = new URL(url);
+        return parsedUrl.hostname.replace(/^www\./, '');
+    } catch (error) {
+        return 'external-link.com';
+    }
+};
+
+const getFaviconUrl = (url: string): string => {
+    try {
+        const domain = extractDomain(url);
+        return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+    } catch (error) {
+        return '/default-favicon.png';
+    }
+};
+
+const getLinkTitle = (url: string): string => {
     try {
         const parsedUrl = new URL(url);
         const hostname = parsedUrl.hostname.replace(/^www\./, '');
-        return hostname.split('.')[0].charAt(0).toUpperCase() + 
-               hostname.split('.')[0].slice(1);
+        const parts = hostname.split('.');
+        if (parts.length >= 2) {
+            return parts[parts.length - 2].charAt(0).toUpperCase() + 
+                   parts[parts.length - 2].slice(1);
+        }
+        return hostname;
     } catch (error) {
         return 'External Link';
     }
 };
 
-const StyledLink = styled(Link)(({ theme }) => ({
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: theme.spacing(1, 2),
-    backgroundColor: theme.palette.grey[200],
-    borderRadius: theme.shape.borderRadius,
-    textDecoration: 'none',
-    color: theme.palette.text.primary,
-    fontWeight: 500,
-    width: '100%', 
-    marginBottom: theme.spacing(1),
-    transition: theme.transitions.create(['background-color', 'transform'], {
+const PreviewCard = styled(Card)(({ theme }) => ({
+    width: '100%',
+    maxWidth: 320,
+    height: 120,
+    borderRadius: theme.shape.borderRadius * 2,
+    transition: theme.transitions.create(['transform', 'box-shadow'], {
         duration: theme.transitions.duration.shorter,
     }),
     '&:hover': {
-        backgroundColor: theme.palette.grey[300],
-        transform: 'translateX(5px)',
-        boxShadow: theme.shadows[2],
+        transform: 'translateY(-4px)',
+        boxShadow: theme.shadows[8],
     },
-    '&::before': {
-        content: '"🌐"',
-        marginRight: theme.spacing(1),
-    },
+    border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+}));
+
+
+const FaviconContainer = styled(Box)(({ theme }) => ({
+    width: 56,
+    height: 56,
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: alpha(theme.palette.primary.main, 0.08),
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: theme.spacing(2),
+    flexShrink: 0,
+    overflow: 'hidden',
+    border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
 }));
 
 const ExternalLinks = ({ externalLinks }: ExternalLinksProps) => {
     const links = externalLinks?.filter(Boolean);
-  
-    return links ? (
-      <Box sx={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center', // Center links horizontally
-        justifyContent: 'center', 
-        width: '100%',
-        maxWidth: 300, // Consistent width
-        margin: '0 auto', // Center the entire container
-        gap: 1 
-      }}>
-        {links.map((link, index) => (
-          <StyledLink 
-            key={index} 
-            href={link} 
-            target="_blank" 
-            rel="noopener noreferrer"
-          >
-            {link ? extractLinkName(link) : `External Link ${index + 1}`}
-          </StyledLink>
-        ))}
-      </Box>
-    ) : null;
+
+    // Compute previews synchronously to avoid hydration mismatch
+    const linkPreviews: LinkPreview[] = React.useMemo(() => {
+        if (!links || links.length === 0) return [];
+        return links.map((link) => ({
+            url: link!,
+            domain: extractDomain(link!),
+            favicon: getFaviconUrl(link!),
+            title: getLinkTitle(link!),
+        }));
+    }, [links]);
+
+    if (!links || links.length === 0) return null;
+
+    return (
+        <Box sx={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center',
+            width: '100%',
+            gap: 2,
+            mt: 3,
+            mb: 2,
+        }}>
+            <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
+                External Links
+            </Typography>
+            <Box sx={{ 
+                display: 'flex', 
+                flexDirection: 'column',
+                gap: 2,
+                width: '100%',
+                alignItems: 'center',
+            }}>
+                {linkPreviews.map((preview, index) => (
+                    <PreviewCard key={index} elevation={2}>
+                        <Box
+                            component="a"
+                            href={preview.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            sx={{ 
+                                textDecoration: 'none', 
+                                color: 'inherit', 
+                                display: 'flex',
+                                alignItems: 'center',
+                                height: '100%',
+                                paddingTop: '0px',
+                                paddingBottom: '8px',
+                                paddingLeft: '16px',
+                                paddingRight: '16px',
+                                cursor: 'pointer',
+                            }}
+                        >
+                            <FaviconContainer>
+                                <Image
+                                    src={preview.favicon}
+                                    alt={preview.title}
+                                    width={32}
+                                    height={32}
+                                    style={{
+                                        objectFit: 'contain',
+                                    }}
+                                    onError={(e) => {
+                                        // Fallback to a default icon if favicon fails to load
+                                        e.currentTarget.style.display = 'none';
+                                    }}
+                                />
+                            </FaviconContainer>
+                            <CardContent sx={{ 
+                                flex: 1, 
+                                padding: '0 !important',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'center',
+                                minWidth: 0,
+                            }}>
+                                <Typography 
+                                    variant="subtitle1" 
+                                    sx={{ 
+                                        fontWeight: 600,
+                                        mb: 0.5,
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
+                                    }}
+                                >
+                                    {preview.title}
+                                </Typography>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                    <Typography 
+                                        variant="caption" 
+                                        sx={{ 
+                                            color: 'text.secondary',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            whiteSpace: 'nowrap',
+                                        }}
+                                    >
+                                        {preview.domain}
+                                    </Typography>
+                                    <OpenInNewIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                                </Box>
+                            </CardContent>
+                        </Box>
+                    </PreviewCard>
+                ))}
+            </Box>
+        </Box>
+    );
 };
 
 export default ExternalLinks;
