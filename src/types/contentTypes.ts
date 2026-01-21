@@ -33,6 +33,13 @@ export interface Content {
     id?: string; // Custom ID field
     category?: 'Collection' | 'Wishlist' | 'Game'; // Category field from Contentful (defaults to 'collection' if not set)
     videoReview?: string;
+    videoReview2?: string;
+    videoReview3?: string;
+    /**
+     * List of friends associated with this game.
+     * Used for filtering only in the "Played Games" (completed) view.
+     */
+    friends?: string[];
     externalLink1?: string;
     externalLink2?: string;
     externalLink3?: string;

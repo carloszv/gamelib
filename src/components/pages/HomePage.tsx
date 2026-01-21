@@ -112,6 +112,7 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesCollection, gam
     const { 
         searchQuery, 
         selectedPlatforms, 
+        selectedFriends,
         viewMode,
         setViewMode,
         showCompleted,
@@ -142,6 +143,19 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesCollection, gam
     const masterpieceCount = React.useMemo(() => {
         return currentList.filter(page => page.masterpiece).length;
     }, [currentList]);
+
+    // Unique friends from completed games (used only in Played Games view)
+    const friendsOptions = React.useMemo(() => {
+        const set = new Set<string>();
+        gamePagesCompleted.forEach(page => {
+            page.friends?.forEach(friend => {
+                if (friend && friend.trim()) {
+                    set.add(friend.trim());
+                }
+            });
+        });
+        return Array.from(set).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+    }, [gamePagesCompleted]);
 
     // Calculate counts for menu
     const collectionCount = gamePagesCollection.length;
@@ -213,8 +227,14 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesCollection, gam
                 
                 // Masterpiece filter - only apply if there are masterpieces in the current view
                 const matchesMasterpiece = masterpieceCount === 0 || !showMasterpiece || page.masterpiece;
+
+                // Friends filter - only applies in Played Games (completed) view
+                const matchesFriends =
+                    viewMode !== 'completed' ||
+                    selectedFriends.length === 0 ||
+                    (page.friends && page.friends.some(friend => selectedFriends.includes(friend)));
                 
-                return matchesSearch && matchesPlatform && matchesCompletion && matchesMasterpiece;
+                return matchesSearch && matchesPlatform && matchesCompletion && matchesMasterpiece && matchesFriends;
             });
             
             setFilteredGamePages(filtered);
@@ -228,7 +248,8 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesCollection, gam
         showCompleted,
         showNotCompleted,
         showMasterpiece,
-        masterpieceCount
+        masterpieceCount,
+        selectedFriends
     ]);
 
     return (
@@ -251,6 +272,7 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesCollection, gam
                     <SearchFilter 
                         PLATFORMS={PLATFORMS} 
                         masterpieceCount={masterpieceCount}
+                        friendsOptions={friendsOptions}
                     />
                     <MenuButton
                         viewMode={viewMode}

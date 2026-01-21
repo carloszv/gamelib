@@ -8,6 +8,8 @@ interface SearchContextType {
   setSearchQuery: (query: string) => void;
   selectedPlatforms: string[];
   setSelectedPlatforms: (platforms: string[]) => void;
+  selectedFriends: string[];
+  setSelectedFriends: (friends: string[]) => void;
   viewMode: ViewMode;
   setViewMode: (mode: ViewMode) => void;
   showCompleted: boolean;
@@ -24,6 +26,8 @@ const SearchContext = createContext<SearchContextType>({
   setSearchQuery: () => {},
   selectedPlatforms: [],
   setSelectedPlatforms: () => {},
+  selectedFriends: [],
+  setSelectedFriends: () => {},
   viewMode: 'collection',
   setViewMode: () => {},
   showCompleted: true,
@@ -39,6 +43,7 @@ export const SearchProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   // Initialize state with default values
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
+   const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>('collection');
   const [showCompleted, setShowCompleted] = useState<boolean>(true);
   const [showNotCompleted, setShowNotCompleted] = useState<boolean>(true);
@@ -55,12 +60,15 @@ export const SearchProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       ? JSON.parse(storedPlatformsJson)
       : defaultPlatforms;
     const storedViewMode = (localStorage.getItem('viewMode') || 'collection') as ViewMode;
+    const storedFriendsJson = localStorage.getItem('selectedFriends');
+    const storedFriends = storedFriendsJson ? JSON.parse(storedFriendsJson) : [];
     const storedShowCompleted = localStorage.getItem('showCompleted') !== 'false';
     const storedShowNotCompleted = localStorage.getItem('showNotCompleted') !== 'false';
     const storedShowMasterpiece = localStorage.getItem('showMasterpiece') === 'true';
 
     setSearchQuery(storedSearchQuery);
     setSelectedPlatforms(storedPlatforms);
+    setSelectedFriends(storedFriends);
     setViewMode(storedViewMode);
     setShowCompleted(storedShowCompleted);
     setShowNotCompleted(storedShowNotCompleted);
@@ -73,6 +81,7 @@ export const SearchProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     if (isHydrated) {
       localStorage.setItem('searchQuery', searchQuery);
       localStorage.setItem('selectedPlatforms', JSON.stringify(selectedPlatforms));
+      localStorage.setItem('selectedFriends', JSON.stringify(selectedFriends));
       localStorage.setItem('viewMode', viewMode);
       localStorage.setItem('showCompleted', String(showCompleted));
       localStorage.setItem('showNotCompleted', String(showNotCompleted));
@@ -81,6 +90,7 @@ export const SearchProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   }, [
     searchQuery,
     selectedPlatforms,
+    selectedFriends,
     viewMode,
     showCompleted,
     showNotCompleted,
@@ -94,6 +104,8 @@ export const SearchProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       setSearchQuery,
       selectedPlatforms,
       setSelectedPlatforms,
+      selectedFriends,
+      setSelectedFriends,
       viewMode,
       setViewMode,
       showCompleted,

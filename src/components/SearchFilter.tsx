@@ -82,9 +82,10 @@ const FilterButton = styled(IconButton)(({ theme }) => ({
 interface SearchFilterProps {
     PLATFORMS: string[];
     masterpieceCount: number;
+    friendsOptions: string[];
 }
 
-const SearchFilter: React.FC<SearchFilterProps> = ({ PLATFORMS, masterpieceCount }) => {    
+const SearchFilter: React.FC<SearchFilterProps> = ({ PLATFORMS, masterpieceCount, friendsOptions }) => {    
     const { 
         selectedPlatforms, 
         setSelectedPlatforms,
@@ -93,7 +94,10 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ PLATFORMS, masterpieceCount
         showNotCompleted,
         setShowNotCompleted,
         showMasterpiece,
-        setShowMasterpiece
+        setShowMasterpiece,
+        viewMode,
+        selectedFriends,
+        setSelectedFriends
     } = useSearch();
     
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -125,6 +129,19 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ PLATFORMS, masterpieceCount
         }
 
         setSelectedPlatforms(newSelectedPlatforms);
+    };
+
+    const handleFriendChange = (friend: string) => {
+        const currentIndex = selectedFriends.indexOf(friend);
+        const newSelectedFriends = [...selectedFriends];
+
+        if (currentIndex === -1) {
+            newSelectedFriends.push(friend);
+        } else {
+            newSelectedFriends.splice(currentIndex, 1);
+        }
+
+        setSelectedFriends(newSelectedFriends);
     };
 
     const handleCompletionChange = (isCompleted: boolean) => {
@@ -190,6 +207,31 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ PLATFORMS, masterpieceCount
                         </StyledMenuItem>
                     ))}
                 </FilterGroup>
+
+                {viewMode === 'completed' && friendsOptions.length > 0 && (
+                    <FilterGroup>
+                        <FilterTitle variant="subtitle2">Friends</FilterTitle>
+                        {friendsOptions.map((friend) => (
+                            <StyledMenuItem 
+                                key={friend} 
+                                onClick={() => handleFriendChange(friend)}
+                                selected={selectedFriends.includes(friend)}
+                            >
+                                <StyledCheckbox
+                                    checked={selectedFriends.includes(friend)}
+                                    size="small"
+                                />
+                                <ListItemText 
+                                    primary={friend}
+                                    primaryTypographyProps={{
+                                        fontSize: '0.875rem',
+                                        fontWeight: selectedFriends.includes(friend) ? 600 : 400,
+                                    }}
+                                />
+                            </StyledMenuItem>
+                        ))}
+                    </FilterGroup>
+                )}
 
                 <FilterGroup>
                     <FilterTitle variant="subtitle2">More</FilterTitle>

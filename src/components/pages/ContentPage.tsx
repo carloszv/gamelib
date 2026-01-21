@@ -311,7 +311,7 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
                             )}
 
                             {/* Video Review Section - Below Description */}
-                            {content.videoReview && (
+                            {(content.videoReview || content.videoReview2 || content.videoReview3) && (
                                 <Paper
                                     elevation={0}
                                     sx={{
@@ -333,7 +333,38 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
                                         Video Review
                                     </Typography>
                                     <Divider sx={{ mb: 3 }} />
-                                    <Video url={content.videoReview} maxWidth={800} />
+
+                                    {content.videoReview && (
+                                        <Box sx={{ mb: (content.videoReview2 || content.videoReview3) ? 3 : 0 }}>
+                                            <Video url={content.videoReview} maxWidth={800} />
+                                        </Box>
+                                    )}
+
+                                    {content.videoReview2 && (
+                                        <Box sx={{ mb: content.videoReview3 ? 3 : 0 }}>
+                                            <Typography
+                                                variant="subtitle1"
+                                                sx={{ fontWeight: 600, mb: 1, color: '#1a1a1a' }}
+                                            >
+                                                Video Review 2
+                                            </Typography>
+                                            <Divider sx={{ mb: 2 }} />
+                                            <Video url={content.videoReview2} maxWidth={800} />
+                                        </Box>
+                                    )}
+
+                                    {content.videoReview3 && (
+                                        <Box>
+                                            <Typography
+                                                variant="subtitle1"
+                                                sx={{ fontWeight: 600, mb: 1, color: '#1a1a1a' }}
+                                            >
+                                                Video Review 3
+                                            </Typography>
+                                            <Divider sx={{ mb: 2 }} />
+                                            <Video url={content.videoReview3} maxWidth={800} />
+                                        </Box>
+                                    )}
                                 </Paper>
                             )}
                         </Grid>
