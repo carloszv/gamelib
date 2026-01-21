@@ -14,6 +14,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import CollectionsIcon from '@mui/icons-material/Collections';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import PeopleIcon from '@mui/icons-material/People';
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
     width: 40,
@@ -66,7 +67,7 @@ const Counter = styled('span')(({ theme }) => ({
     textAlign: 'center',
 }));
 
-type ViewMode = 'collection' | 'wishlist' | 'completed';
+type ViewMode = 'collection' | 'wishlist' | 'completed' | 'friends';
 
 type MenuButtonProps = {
     viewMode: ViewMode;
@@ -74,6 +75,7 @@ type MenuButtonProps = {
     collectionCount: number;
     wishlistCount: number;
     completedCount: number;
+    friendsCount: number;
 }
 
 const MenuButton: React.FC<MenuButtonProps> = ({ 
@@ -81,7 +83,8 @@ const MenuButton: React.FC<MenuButtonProps> = ({
     onViewModeChange, 
     collectionCount,
     wishlistCount,
-    completedCount
+    completedCount,
+    friendsCount
 }) => {
     const [open, setOpen] = useState(false);
 
@@ -118,6 +121,13 @@ const MenuButton: React.FC<MenuButtonProps> = ({
             label: 'Played Games',
             icon: <CheckCircleIcon />,
             count: completedCount,
+            enabled: true,
+        },
+        {
+            mode: 'friends' as ViewMode,
+            label: 'Friends',
+            icon: <PeopleIcon />,
+            count: friendsCount,
             enabled: true,
         },
     ];

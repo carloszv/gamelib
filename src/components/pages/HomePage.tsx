@@ -106,13 +106,15 @@ interface HomePageProps {
     gamePagesCollection: Content[];
     gamePagesWishList: Content[];
     gamePagesCompleted: Content[];
+    gamePagesFriends: Content[];
 }
 
-const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesCollection, gamePagesWishList, gamePagesCompleted }) => {
+const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesCollection, gamePagesWishList, gamePagesCompleted, gamePagesFriends }) => {
     const { 
         searchQuery, 
         selectedPlatforms, 
         selectedFriends,
+        setSelectedFriends,
         viewMode,
         setViewMode,
         showCompleted,
@@ -133,21 +135,23 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesCollection, gam
                 return gamePagesWishList;
             case 'completed':
                 return gamePagesCompleted;
+            case 'friends':
+                return gamePagesFriends;
             case 'collection':
             default:
                 return gamePagesCollection;
         }
-    }, [viewMode, gamePagesCollection, gamePagesWishList, gamePagesCompleted]);
+    }, [viewMode, gamePagesCollection, gamePagesWishList, gamePagesCompleted, gamePagesFriends]);
 
     // Count masterpieces in the current list
     const masterpieceCount = React.useMemo(() => {
         return currentList.filter(page => page.masterpiece).length;
     }, [currentList]);
 
-    // Unique friends from completed games (used only in Played Games view)
+    // Unique friends from all games (used only in Friends view)
     const friendsOptions = React.useMemo(() => {
         const set = new Set<string>();
-        gamePagesCompleted.forEach(page => {
+        gamePages.forEach(page => {
             page.friends?.forEach(friend => {
                 if (friend && friend.trim()) {
                     set.add(friend.trim());
@@ -155,12 +159,20 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesCollection, gam
             });
         });
         return Array.from(set).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
-    }, [gamePagesCompleted]);
+    }, [gamePages]);
 
     // Calculate counts for menu
     const collectionCount = gamePagesCollection.length;
     const wishlistCount = gamePagesWishList.length;
     const completedCount = gamePagesCompleted.length;
+    const friendsCount = gamePagesFriends.length;
+
+    // Auto-select all friends when entering Friends view for the first time
+    useEffect(() => {
+        if (viewMode === 'friends' && friendsOptions.length > 0 && selectedFriends.length === 0) {
+            setSelectedFriends([...friendsOptions]);
+        }
+    }, [viewMode, friendsOptions, selectedFriends.length]);
 
     // Preload images and prevent body scroll while loading
     useEffect(() => {
@@ -179,6 +191,9 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesCollection, gam
                 };
                 if (gamePagesCompleted.length !== 0) {
                     await preloadImages(gamePagesCompleted);
+                };
+                if (gamePagesFriends.length !== 0) {
+                    await preloadImages(gamePagesFriends);
                 };
                 
                 // Add a slight delay to ensure a smooth transition
@@ -207,7 +222,7 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesCollection, gam
             document.body.style.position = originalPosition;
             document.body.style.width = '';
         };
-    }, [gamePagesCollection, gamePagesWishList, gamePagesCompleted]);
+    }, [gamePagesCollection, gamePagesWishList, gamePagesCompleted, gamePagesFriends]);
 
     // Filtering logic consolidated into one useEffect
     useEffect(() => {
@@ -228,9 +243,9 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesCollection, gam
                 // Masterpiece filter - only apply if there are masterpieces in the current view
                 const matchesMasterpiece = masterpieceCount === 0 || !showMasterpiece || page.masterpiece;
 
-                // Friends filter - only applies in Played Games (completed) view
+                // Friends filter - only applies in Friends view
                 const matchesFriends =
-                    viewMode !== 'completed' ||
+                    viewMode !== 'friends' ||
                     selectedFriends.length === 0 ||
                     (page.friends && page.friends.some(friend => selectedFriends.includes(friend)));
                 
@@ -280,6 +295,7 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesCollection, gam
                         collectionCount={collectionCount}
                         wishlistCount={wishlistCount}
                         completedCount={completedCount}
+                        friendsCount={friendsCount}
                     />
                 </div>
                 <ListCounter filteredGamePages={filteredGamePages} />

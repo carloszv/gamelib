@@ -208,7 +208,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ PLATFORMS, masterpieceCount
                     ))}
                 </FilterGroup>
 
-                {viewMode === 'completed' && friendsOptions.length > 0 && (
+                {viewMode === 'friends' && friendsOptions.length > 0 && (
                     <FilterGroup>
                         <FilterTitle variant="subtitle2">Friends</FilterTitle>
                         {friendsOptions.map((friend) => (

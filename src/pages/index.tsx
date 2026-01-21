@@ -10,9 +10,10 @@ interface HomeProps {
     gamePagesCollection: Content[];
     gamePagesWishList: Content[];
     gamePagesCompleted: Content[];
+    gamePagesFriends: Content[];
 }
 
-const Home: React.FC<HomeProps> = ({ gamePages, gamePagesCollection, gamePagesWishList, gamePagesCompleted }) => {
+const Home: React.FC<HomeProps> = ({ gamePages, gamePagesCollection, gamePagesWishList, gamePagesCompleted, gamePagesFriends }) => {
     return (
         <SearchProvider>
             <HomePage 
@@ -20,6 +21,7 @@ const Home: React.FC<HomeProps> = ({ gamePages, gamePagesCollection, gamePagesWi
                 gamePagesCollection={gamePagesCollection} 
                 gamePagesWishList={gamePagesWishList}
                 gamePagesCompleted={gamePagesCompleted}
+                gamePagesFriends={gamePagesFriends}
             />
         </SearchProvider>
     );
@@ -60,6 +62,11 @@ export const getStaticProps = async () => {
             })
             .sort(sortByTitle);
         
+        // Friends: All games that have the friends field with any value
+        const gamePagesFriends = gamePages
+            .filter(game => game.friends && game.friends.length > 0)
+            .sort(sortByTitle);
+        
         // Keep sorted for backward compatibility
         const sortedGamePages = gamePages.sort(sortByTitle);
         
@@ -69,6 +76,7 @@ export const getStaticProps = async () => {
                 gamePagesCollection,
                 gamePagesWishList,
                 gamePagesCompleted,
+                gamePagesFriends,
             },
             revalidate: 60,
         };
@@ -80,6 +88,7 @@ export const getStaticProps = async () => {
                 gamePagesCollection: [],
                 gamePagesWishList: [],
                 gamePagesCompleted: [],
+                gamePagesFriends: [],
             },
             revalidate: 60,
         };

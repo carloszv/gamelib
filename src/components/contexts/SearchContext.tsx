@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 
-export type ViewMode = 'collection' | 'wishlist' | 'completed';
+export type ViewMode = 'collection' | 'wishlist' | 'completed' | 'friends';
 
 // Define the shape of the context
 interface SearchContextType {
