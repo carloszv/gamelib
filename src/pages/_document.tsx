@@ -87,16 +87,26 @@ class MyDocument extends Document {
               }
               @media (max-width: 600px) {
                 .hero-cover-image {
-                  object-fit: contain;
+                  object-fit: contain !important;
+                  width: 100% !important;
+                  height: auto !important;
                 }
                 .hero-section-mobile {
                   height: auto !important;
                   min-height: auto !important;
                   max-height: none !important;
                   background-color: transparent !important;
-                  display: flex !important;
-                  align-items: center !important;
-                  justify-content: center !important;
+                  display: block !important;
+                  position: relative !important;
+                }
+                .hero-section-mobile > span {
+                  position: relative !important;
+                  width: 100% !important;
+                  display: block !important;
+                }
+                .hero-section-mobile img {
+                  object-fit: contain !important;
+                  position: relative !important;
                 }
                 .cover-image-container {
                   aspect-ratio: 3 / 4;

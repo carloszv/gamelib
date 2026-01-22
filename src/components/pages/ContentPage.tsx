@@ -8,6 +8,8 @@ import { Document } from '@contentful/rich-text-types';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CloseIcon from '@mui/icons-material/Close';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import {
     Box,
     CircularProgress,
@@ -22,7 +24,12 @@ import {
     Divider,
     Grid,
     alpha,
-    styled
+    styled,
+    Snackbar,
+    Alert,
+    Tooltip,
+    useMediaQuery,
+    useTheme
 } from '@mui/material';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -108,12 +115,15 @@ const PlatformChip = styled(Chip)(({ theme }) => ({
 
 const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
     const router = useRouter();
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [mounted, setMounted] = useState(false);
     const [openFullScreen, setOpenFullScreen] = useState(false);
     const [imageError, setImageError] = useState(false);
     const [coverError, setCoverError] = useState(false);
     const [dialogImageError, setDialogImageError] = useState(false);
     const [dialogImageUrl, setDialogImageUrl] = useState<string | null>(null);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
 
     useEffect(() => {
         setMounted(true);
@@ -143,6 +153,31 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
         setOpenFullScreen(false);
         setDialogImageError(false);
         setDialogImageUrl(null);
+    };
+
+    const handleWhatsAppShare = () => {
+        if (typeof window !== 'undefined') {
+            const url = window.location.href;
+            const text = `Check out ${content.title}!`;
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+    };
+
+    const handleCopyLink = async () => {
+        if (typeof window !== 'undefined') {
+            try {
+                const url = window.location.href;
+                await navigator.clipboard.writeText(url);
+                setSnackbarOpen(true);
+            } catch (err) {
+                console.error('Failed to copy link:', err);
+            }
+        }
+    };
+
+    const handleCloseSnackbar = () => {
+        setSnackbarOpen(false);
     };
 
     // Only render content after mount to prevent hydration mismatches
@@ -177,17 +212,34 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
                     {/* Hero Section with Cover Image */}
                     <HeroSection className="hero-section-mobile">
                         {content.cover?.fields.file.url && !imageError ? (
-                            <Image
-                                src={convertURL(content.cover.fields.file.url)}
-                                alt={content.title}
-                                fill
-                                className="hero-cover-image"
-                                style={{
-                                    objectFit: 'cover',
-                                    objectPosition: 'center',
-                                }}
-                                onError={() => setImageError(true)}
-                            />
+                            isMobile ? (
+                                <Image
+                                    src={convertURL(content.cover.fields.file.url)}
+                                    alt={content.title}
+                                    width={800}
+                                    height={1067}
+                                    className="hero-cover-image"
+                                    style={{
+                                        width: '100%',
+                                        height: 'auto',
+                                        objectFit: 'contain',
+                                        objectPosition: 'center',
+                                    }}
+                                    onError={() => setImageError(true)}
+                                />
+                            ) : (
+                                <Image
+                                    src={convertURL(content.cover.fields.file.url)}
+                                    alt={content.title}
+                                    fill
+                                    className="hero-cover-image"
+                                    style={{
+                                        objectFit: 'cover',
+                                        objectPosition: 'center',
+                                    }}
+                                    onError={() => setImageError(true)}
+                                />
+                            )
                         ) : (
                             <Box
                                 sx={{
@@ -239,23 +291,54 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
 
                     {/* Title and Platform Section */}
                     <Box sx={{ mb: 4 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap', mb: 2 }}>
-                            <Typography 
-                                variant="h3" 
-                                component="h1" 
-                                className="content-title-responsive"
-                                sx={{ 
-                                    fontWeight: 700,
-                                    fontSize: '2rem',
-                                    lineHeight: 1.2,
-                                    color: '#1a1a1a',
-                                }}
-                            >
-                                {content.title}
-                            </Typography>
-                            {content.platform && (
-                                <PlatformChip label={content.platform} />
-                            )}
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap', mb: 2 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap', flex: 1 }}>
+                                <Typography 
+                                    variant="h3" 
+                                    component="h1" 
+                                    className="content-title-responsive"
+                                    sx={{ 
+                                        fontWeight: 700,
+                                        fontSize: '2rem',
+                                        lineHeight: 1.2,
+                                        color: '#1a1a1a',
+                                    }}
+                                >
+                                    {content.title}
+                                </Typography>
+                                {content.platform && (
+                                    <PlatformChip label={content.platform} />
+                                )}
+                            </Box>
+                            {/* Share Buttons */}
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Tooltip title="Share on WhatsApp">
+                                    <IconButton
+                                        onClick={handleWhatsAppShare}
+                                        sx={{
+                                            backgroundColor: 'white',
+                                            '&:hover': {
+                                                backgroundColor: alpha('#25D366', 0.1),
+                                            },
+                                        }}
+                                    >
+                                        <WhatsAppIcon sx={{ color: '#25D366' }} />
+                                    </IconButton>
+                                </Tooltip>
+                                <Tooltip title="Copy link">
+                                    <IconButton
+                                        onClick={handleCopyLink}
+                                        sx={{
+                                            backgroundColor: 'white',
+                                            '&:hover': {
+                                                backgroundColor: alpha('#000', 0.05),
+                                            },
+                                        }}
+                                    >
+                                        <ContentCopyIcon />
+                                    </IconButton>
+                                </Tooltip>
+                            </Box>
                         </Box>
                         <Divider sx={{ my: 3 }} />
                     </Box>
@@ -540,6 +623,18 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
                     )}
                 </DialogContent>
             </Dialog>
+
+            {/* Snackbar for copy link notification */}
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={3000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
+                    Link copied to clipboard!
+                </Alert>
+            </Snackbar>
         </Layout>
     );
 };
