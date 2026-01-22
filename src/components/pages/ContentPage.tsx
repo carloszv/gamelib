@@ -50,6 +50,12 @@ const HeroSection = styled(Box)(({ theme }) => ({
     borderRadius: theme.shape.borderRadius * 2,
     overflow: 'hidden',
     backgroundColor: '#1a1a1a',
+    [theme.breakpoints.down('sm')]: {
+        height: 'auto',
+        minHeight: 'auto',
+        maxHeight: 'none',
+        backgroundColor: 'transparent',
+    },
 }));
 
 const CoverImageContainer = styled(Box)(({ theme }) => ({
@@ -64,8 +70,10 @@ const CoverImageContainer = styled(Box)(({ theme }) => ({
         transform: 'translateY(-4px)',
         boxShadow: theme.shadows[8],
     },
-    // Video game case aspect ratio (approximately 16:9 or similar)
     aspectRatio: '16 / 9',
+    [theme.breakpoints.down('sm')]: {
+        aspectRatio: '3 / 4',
+    },
 }));
 
 const ScoreBadge = styled(Box)(({ theme }) => ({
@@ -84,6 +92,12 @@ const ScoreBadge = styled(Box)(({ theme }) => ({
     border: '4px solid white',
     boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
     zIndex: 2,
+    [theme.breakpoints.down('sm')]: {
+        width: 80,
+        height: 80,
+        fontSize: 28,
+        border: '3px solid white',
+    },
 }));
 
 const MasterpieceBadge = styled(Box)(({ theme }) => ({
@@ -194,7 +208,7 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
     return (
         <Layout title={content.title}>
             <Box sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
-                <Container maxWidth="lg" className="content-container-responsive" sx={{ py: 3 }}>
+                <Container maxWidth="lg" sx={{ py: { xs: 3, md: 5 } }}>
                     {/* Back Button */}
                     <IconButton 
                         onClick={handleBackClick} 
@@ -210,29 +224,27 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
                     </IconButton>
 
                     {/* Hero Section with Cover Image */}
-                    <HeroSection className="hero-section-mobile">
+                    <HeroSection>
                         {content.cover?.fields.file.url && !imageError ? (
                             isMobile ? (
-                                <Image
-                                    src={convertURL(content.cover.fields.file.url)}
-                                    alt={content.title}
-                                    width={800}
-                                    height={1067}
-                                    className="hero-cover-image"
-                                    style={{
-                                        width: '100%',
-                                        height: 'auto',
-                                        objectFit: 'contain',
-                                        objectPosition: 'center',
-                                    }}
-                                    onError={() => setImageError(true)}
-                                />
+                            <Image
+                                src={convertURL(content.cover.fields.file.url)}
+                                alt={content.title}
+                                width={800}
+                                height={1067}
+                                style={{
+                                    width: '100%',
+                                    height: 'auto',
+                                    objectFit: 'contain',
+                                    objectPosition: 'center',
+                                }}
+                                onError={() => setImageError(true)}
+                            />
                             ) : (
                                 <Image
                                     src={convertURL(content.cover.fields.file.url)}
                                     alt={content.title}
                                     fill
-                                    className="hero-cover-image"
                                     style={{
                                         objectFit: 'cover',
                                         objectPosition: 'center',
@@ -273,7 +285,7 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
 
                         {/* Score Badge */}
                         {content.rating && (
-                            <ScoreBadge className="score-badge-responsive" sx={getRatingStyle(content.rating)}>
+                            <ScoreBadge sx={getRatingStyle(content.rating)}>
                                 {content.rating}
                             </ScoreBadge>
                         )}
@@ -291,17 +303,35 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
 
                     {/* Title and Platform Section */}
                     <Box sx={{ mb: 4 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap', mb: 2 }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap', flex: 1 }}>
+                        <Box 
+                            sx={{ 
+                                display: 'flex', 
+                                flexDirection: { xs: 'column', sm: 'row' },
+                                alignItems: { xs: 'center', sm: 'center' },
+                                justifyContent: { xs: 'center', sm: 'space-between' },
+                                gap: 2, 
+                                mb: 2 
+                            }}
+                        >
+                            {/* Title and Platform - Desktop: side by side, Mobile: stacked and centered */}
+                            <Box 
+                                sx={{ 
+                                    display: 'flex', 
+                                    flexDirection: { xs: 'column', sm: 'row' },
+                                    alignItems: { xs: 'center', sm: 'center' },
+                                    gap: { xs: 2, sm: 2 },
+                                    flex: 1,
+                                }}
+                            >
                                 <Typography 
                                     variant="h3" 
-                                    component="h1" 
-                                    className="content-title-responsive"
+                                    component="h1"
                                     sx={{ 
                                         fontWeight: 700,
-                                        fontSize: '2rem',
+                                        fontSize: { xs: '2rem', md: '2.75rem' },
                                         lineHeight: 1.2,
                                         color: '#1a1a1a',
+                                        textAlign: { xs: 'center', sm: 'left' },
                                     }}
                                 >
                                     {content.title}
@@ -311,7 +341,14 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
                                 )}
                             </Box>
                             {/* Share Buttons */}
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Box 
+                                sx={{ 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    gap: 1,
+                                    order: { xs: 2, sm: 1 },
+                                }}
+                            >
                                 <Tooltip title="Share on WhatsApp">
                                     <IconButton
                                         onClick={handleWhatsAppShare}
@@ -351,9 +388,8 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
                             {content.article && (
                                 <Paper
                                     elevation={0}
-                                    className="review-paper-responsive"
                                     sx={{
-                                        p: 3,
+                                        p: { xs: 3, md: 4 },
                                         borderRadius: 2,
                                         backgroundColor: 'white',
                                         mb: 3,
@@ -362,12 +398,11 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
                                     <Typography
                                         variant="h5"
                                         component="h2"
-                                        className="review-title-responsive"
                                         sx={{
                                             fontWeight: 700,
                                             mb: 3,
                                             color: '#1a1a1a',
-                                            fontSize: '1.5rem',
+                                            fontSize: { xs: '1.5rem', md: '1.75rem' },
                                         }}
                                     >
                                         Review
@@ -397,9 +432,8 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
                             {(content.videoReview || content.videoReview2 || content.videoReview3) && (
                                 <Paper
                                     elevation={0}
-                                    className="video-paper-responsive"
                                     sx={{
-                                        p: 3,
+                                        p: { xs: 3, md: 4 },
                                         borderRadius: 2,
                                         backgroundColor: 'white',
                                     }}
@@ -407,12 +441,11 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
                                     <Typography
                                         variant="h5"
                                         component="h3"
-                                        className="video-title-responsive"
                                         sx={{
                                             fontWeight: 700,
                                             mb: 3,
                                             color: '#1a1a1a',
-                                            fontSize: '1.5rem',
+                                            fontSize: { xs: '1.5rem', md: '1.75rem' },
                                         }}
                                     >
                                         Video Review
@@ -461,16 +494,15 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
                                 {content.cover?.fields.file.url && (
                                     <Paper
                                         elevation={0}
-                                        className="cover-sidebar-desktop"
                                         sx={{
                                             p: 2,
                                             mb: 3,
                                             borderRadius: 2,
                                             backgroundColor: 'white',
+                                            display: { xs: 'none', md: 'block' },
                                         }}
                                     >
                                         <CoverImageContainer
-                                            className="cover-image-container"
                                             onClick={() => handleOpenFullScreen(convertURL(content.cover!.fields.file.url))}
                                         >
                                             {!coverError ? (
