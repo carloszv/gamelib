@@ -45,11 +45,6 @@ const HeroSection = styled(Box)(({ theme }) => ({
     borderRadius: theme.shape.borderRadius * 2,
     overflow: 'hidden',
     backgroundColor: '#1a1a1a',
-    cursor: 'pointer',
-    transition: 'transform 0.3s ease',
-    '&:hover': {
-        transform: 'scale(1.01)',
-    },
     [theme.breakpoints.down('sm')]: {
         height: 'auto',
         minHeight: 'auto',
@@ -58,6 +53,25 @@ const HeroSection = styled(Box)(({ theme }) => ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+    },
+}));
+
+const CoverImageContainer = styled(Box)(({ theme }) => ({
+    position: 'relative',
+    width: '100%',
+    borderRadius: theme.shape.borderRadius * 2,
+    overflow: 'hidden',
+    backgroundColor: '#f0f0f0',
+    cursor: 'pointer',
+    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+    '&:hover': {
+        transform: 'translateY(-4px)',
+        boxShadow: theme.shadows[8],
+    },
+    // Video game case aspect ratio (approximately 16:9 or similar)
+    aspectRatio: '16 / 9',
+    [theme.breakpoints.down('sm')]: {
+        aspectRatio: '3 / 4', // More vertical on mobile
     },
 }));
 
@@ -117,7 +131,9 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [openFullScreen, setOpenFullScreen] = useState(false);
     const [imageError, setImageError] = useState(false);
+    const [coverError, setCoverError] = useState(false);
     const [dialogImageError, setDialogImageError] = useState(false);
+    const [dialogImageUrl, setDialogImageUrl] = useState<string | null>(null);
 
     if (router.isFallback) {
         return (
@@ -131,13 +147,15 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
         router.push('/');
     };
 
-    const handleOpenFullScreen = () => {
+    const handleOpenFullScreen = (imageUrl: string) => {
+        setDialogImageUrl(imageUrl);
         setOpenFullScreen(true);
     };
 
     const handleCloseFullScreen = () => {
         setOpenFullScreen(false);
         setDialogImageError(false);
+        setDialogImageUrl(null);
     };
 
     if (!content) return null;
@@ -161,7 +179,7 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
                     </IconButton>
 
                     {/* Hero Section with Cover Image */}
-                    <HeroSection onClick={handleOpenFullScreen}>
+                    <HeroSection>
                         {content.cover?.fields.file.url && !imageError ? (
                             isMobile ? (
                                 <Image
@@ -369,9 +387,57 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
                             )}
                         </Grid>
 
-                        {/* Right Sidebar: External Links */}
+                        {/* Right Sidebar: Cover Image and External Links */}
                         <Grid item xs={12} md={4}>
                             <Box sx={{ position: 'sticky', top: 20 }}>
+                                {/* Cover Image - Desktop only */}
+                                {content.cover?.fields.file.url && (
+                                    <Paper
+                                        elevation={0}
+                                        sx={{
+                                            p: 2,
+                                            mb: 3,
+                                            borderRadius: 2,
+                                            backgroundColor: 'white',
+                                            display: { xs: 'none', md: 'block' }, // Hide on mobile, show on desktop
+                                        }}
+                                    >
+                                        <CoverImageContainer
+                                            onClick={() => handleOpenFullScreen(convertURL(content.cover!.fields.file.url))}
+                                        >
+                                            {!coverError ? (
+                                                <Image
+                                                    src={convertURL(content.cover.fields.file.url)}
+                                                    alt={`${content.title} Cover`}
+                                                    fill
+                                                    style={{
+                                                        objectFit: 'contain',
+                                                        objectPosition: 'center',
+                                                    }}
+                                                    onError={() => setCoverError(true)}
+                                                />
+                                            ) : (
+                                                <Box
+                                                    sx={{
+                                                        position: 'absolute',
+                                                        top: 0,
+                                                        left: 0,
+                                                        right: 0,
+                                                        bottom: 0,
+                                                        backgroundColor: '#e0e0e0',
+                                                        backgroundImage: `
+                                                            repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,.1) 10px, rgba(255,255,255,.1) 20px),
+                                                            repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(255,255,255,.1) 10px, rgba(255,255,255,.1) 20px)
+                                                        `,
+                                                        filter: 'blur(20px)',
+                                                    }}
+                                                />
+                                            )}
+                                        </CoverImageContainer>
+                                    </Paper>
+                                )}
+
+                                {/* External Links */}
                                 <Paper
                                     elevation={0}
                                     sx={{
@@ -439,7 +505,7 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
                         <CloseIcon />
                     </IconButton>
 
-                    {content.cover?.fields.file.url && !dialogImageError ? (
+                    {dialogImageUrl && !dialogImageError ? (
                         <Box
                             sx={{
                                 position: 'relative',
@@ -453,7 +519,7 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
                             }}
                         >
                             <Image
-                                src={convertURL(content.cover.fields.file.url)}
+                                src={dialogImageUrl}
                                 alt={content.title}
                                 width={1200}
                                 height={1600}
