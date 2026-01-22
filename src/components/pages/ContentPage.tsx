@@ -22,13 +22,11 @@ import {
     Divider,
     Grid,
     alpha,
-    styled,
-    useMediaQuery,
-    useTheme
+    styled
 } from '@mui/material';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 
 interface ContentPageProps {
@@ -45,15 +43,6 @@ const HeroSection = styled(Box)(({ theme }) => ({
     borderRadius: theme.shape.borderRadius * 2,
     overflow: 'hidden',
     backgroundColor: '#1a1a1a',
-    [theme.breakpoints.down('sm')]: {
-        height: 'auto',
-        minHeight: 'auto',
-        maxHeight: 'none',
-        backgroundColor: 'transparent', // Remove dark background on mobile
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
 }));
 
 const CoverImageContainer = styled(Box)(({ theme }) => ({
@@ -70,9 +59,6 @@ const CoverImageContainer = styled(Box)(({ theme }) => ({
     },
     // Video game case aspect ratio (approximately 16:9 or similar)
     aspectRatio: '16 / 9',
-    [theme.breakpoints.down('sm')]: {
-        aspectRatio: '3 / 4', // More vertical on mobile
-    },
 }));
 
 const ScoreBadge = styled(Box)(({ theme }) => ({
@@ -91,12 +77,6 @@ const ScoreBadge = styled(Box)(({ theme }) => ({
     border: '4px solid white',
     boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
     zIndex: 2,
-    [theme.breakpoints.down('sm')]: {
-        width: 80,
-        height: 80,
-        fontSize: 28,
-        border: '3px solid white',
-    },
 }));
 
 const MasterpieceBadge = styled(Box)(({ theme }) => ({
@@ -125,16 +105,21 @@ const PlatformChip = styled(Chip)(({ theme }) => ({
     border: `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
 }));
 
+
 const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
     const router = useRouter();
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const [mounted, setMounted] = useState(false);
     const [openFullScreen, setOpenFullScreen] = useState(false);
     const [imageError, setImageError] = useState(false);
     const [coverError, setCoverError] = useState(false);
     const [dialogImageError, setDialogImageError] = useState(false);
     const [dialogImageUrl, setDialogImageUrl] = useState<string | null>(null);
 
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    // Handle fallback state consistently
     if (router.isFallback) {
         return (
             <Container maxWidth="md" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
@@ -142,6 +127,8 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
             </Container>
         );
     }
+
+    if (!content) return null;
 
     const handleBackClick = () => {
         router.push('/');
@@ -158,12 +145,21 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
         setDialogImageUrl(null);
     };
 
-    if (!content) return null;
+    // Only render content after mount to prevent hydration mismatches
+    if (!mounted) {
+        return (
+            <Layout title={content.title || 'Loading...'}>
+                <Container maxWidth="md" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                    <CircularProgress color="secondary" size={60} thickness={4} />
+                </Container>
+            </Layout>
+        );
+    }
 
     return (
         <Layout title={content.title}>
             <Box sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
-                <Container maxWidth="lg" sx={{ py: { xs: 3, md: 5 } }}>
+                <Container maxWidth="lg" className="content-container-responsive" sx={{ py: 3 }}>
                     {/* Back Button */}
                     <IconButton 
                         onClick={handleBackClick} 
@@ -179,36 +175,19 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
                     </IconButton>
 
                     {/* Hero Section with Cover Image */}
-                    <HeroSection>
+                    <HeroSection className="hero-section-mobile">
                         {content.cover?.fields.file.url && !imageError ? (
-                            isMobile ? (
-                                <Image
-                                    src={convertURL(content.cover.fields.file.url)}
-                                    alt={content.title}
-                                    width={800}
-                                    height={1200}
-                                    style={{
-                                        width: '100%',
-                                        height: 'auto',
-                                        objectFit: 'contain',
-                                        display: 'block',
-                                    }}
-                                    priority
-                                    onError={() => setImageError(true)}
-                                />
-                            ) : (
-                                <Image
-                                    src={convertURL(content.cover.fields.file.url)}
-                                    alt={content.title}
-                                    fill
-                                    style={{
-                                        objectFit: 'cover',
-                                        objectPosition: 'center',
-                                    }}
-                                    priority
-                                    onError={() => setImageError(true)}
-                                />
-                            )
+                            <Image
+                                src={convertURL(content.cover.fields.file.url)}
+                                alt={content.title}
+                                fill
+                                className="hero-cover-image"
+                                style={{
+                                    objectFit: 'cover',
+                                    objectPosition: 'center',
+                                }}
+                                onError={() => setImageError(true)}
+                            />
                         ) : (
                             <Box
                                 sx={{
@@ -242,7 +221,7 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
 
                         {/* Score Badge */}
                         {content.rating && (
-                            <ScoreBadge sx={getRatingStyle(content.rating)}>
+                            <ScoreBadge className="score-badge-responsive" sx={getRatingStyle(content.rating)}>
                                 {content.rating}
                             </ScoreBadge>
                         )}
@@ -264,9 +243,10 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
                             <Typography 
                                 variant="h3" 
                                 component="h1" 
+                                className="content-title-responsive"
                                 sx={{ 
                                     fontWeight: 700,
-                                    fontSize: { xs: '2rem', md: '2.75rem' },
+                                    fontSize: '2rem',
                                     lineHeight: 1.2,
                                     color: '#1a1a1a',
                                 }}
@@ -288,8 +268,9 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
                             {content.article && (
                                 <Paper
                                     elevation={0}
+                                    className="review-paper-responsive"
                                     sx={{
-                                        p: { xs: 3, md: 4 },
+                                        p: 3,
                                         borderRadius: 2,
                                         backgroundColor: 'white',
                                         mb: 3,
@@ -298,11 +279,12 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
                                     <Typography
                                         variant="h5"
                                         component="h2"
+                                        className="review-title-responsive"
                                         sx={{
                                             fontWeight: 700,
                                             mb: 3,
                                             color: '#1a1a1a',
-                                            fontSize: { xs: '1.5rem', md: '1.75rem' },
+                                            fontSize: '1.5rem',
                                         }}
                                     >
                                         Review
@@ -332,8 +314,9 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
                             {(content.videoReview || content.videoReview2 || content.videoReview3) && (
                                 <Paper
                                     elevation={0}
+                                    className="video-paper-responsive"
                                     sx={{
-                                        p: { xs: 3, md: 4 },
+                                        p: 3,
                                         borderRadius: 2,
                                         backgroundColor: 'white',
                                     }}
@@ -341,11 +324,12 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
                                     <Typography
                                         variant="h5"
                                         component="h3"
+                                        className="video-title-responsive"
                                         sx={{
                                             fontWeight: 700,
                                             mb: 3,
                                             color: '#1a1a1a',
-                                            fontSize: { xs: '1.5rem', md: '1.75rem' },
+                                            fontSize: '1.5rem',
                                         }}
                                     >
                                         Video Review
@@ -394,15 +378,16 @@ const ContentPage: React.FC<ContentPageProps> = ({ content }) => {
                                 {content.cover?.fields.file.url && (
                                     <Paper
                                         elevation={0}
+                                        className="cover-sidebar-desktop"
                                         sx={{
                                             p: 2,
                                             mb: 3,
                                             borderRadius: 2,
                                             backgroundColor: 'white',
-                                            display: { xs: 'none', md: 'block' }, // Hide on mobile, show on desktop
                                         }}
                                     >
                                         <CoverImageContainer
+                                            className="cover-image-container"
                                             onClick={() => handleOpenFullScreen(convertURL(content.cover!.fields.file.url))}
                                         >
                                             {!coverError ? (
