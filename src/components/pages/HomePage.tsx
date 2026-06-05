@@ -12,6 +12,8 @@ import React, { useEffect, useState } from 'react';
 import GameGrid from '../GameGrid';
 import SearchBar from '../SearchBar';
 import { Content } from '../../types/contentTypes';
+import { categoryToViewMode, viewModeToCategory } from '@/util/viewMode';
+import { ViewMode } from '@/components/contexts/SearchContext';
 
 const useStyles = makeStyles((theme) => ({
     fullScreenOverlay: {
@@ -167,6 +169,24 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesCollection, gam
     const completedCount = gamePagesCompleted.length;
     const friendsCount = gamePagesFriends.length;
 
+    const handleViewModeChange = (mode: ViewMode) => {
+        const category = viewModeToCategory(mode);
+        setViewMode(mode);
+        router.push(`/${category}`);
+    };
+
+    // Sync view mode when navigating via URL (back/forward, direct links)
+    useEffect(() => {
+        if (!router.isReady) return;
+
+        const category = router.query.category as string | undefined;
+        const modeFromUrl = categoryToViewMode(category);
+
+        if (modeFromUrl && modeFromUrl !== viewMode) {
+            setViewMode(modeFromUrl);
+        }
+    }, [router.isReady, router.query.category, viewMode, setViewMode]);
+
     // Auto-select all friends when entering Friends view for the first time
     useEffect(() => {
         if (viewMode === 'friends' && friendsOptions.length > 0 && selectedFriends.length === 0) {
@@ -176,7 +196,6 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesCollection, gam
 
     // Preload images and prevent body scroll while loading
     useEffect(() => {
-        // Prevent body scroll while loading
         const originalOverflow = document.body.style.overflow;
         const originalPosition = document.body.style.position;
         document.body.style.overflow = 'hidden';
@@ -196,10 +215,8 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesCollection, gam
                     await preloadImages(gamePagesFriends);
                 };
                 
-                // Add a slight delay to ensure a smooth transition
                 setTimeout(() => {
                     setImagesLoaded(true);
-                    // Restore body scroll
                     document.body.style.overflow = originalOverflow;
                     document.body.style.position = originalPosition;
                     document.body.style.width = '';
@@ -207,7 +224,6 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesCollection, gam
             } catch (error) {
                 console.error('Error preloading images:', error);
                 setImagesLoaded(true);
-                // Restore body scroll on error
                 document.body.style.overflow = originalOverflow;
                 document.body.style.position = originalPosition;
                 document.body.style.width = '';
@@ -216,7 +232,6 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesCollection, gam
 
         loadImages();
 
-        // Cleanup function to restore scroll if component unmounts
         return () => {
             document.body.style.overflow = originalOverflow;
             document.body.style.position = originalPosition;
@@ -291,7 +306,7 @@ const HomePage: React.FC<HomePageProps> = ({ gamePages, gamePagesCollection, gam
                     />
                     <MenuButton
                         viewMode={viewMode}
-                        onViewModeChange={setViewMode}
+                        onViewModeChange={handleViewModeChange}
                         collectionCount={collectionCount}
                         wishlistCount={wishlistCount}
                         completedCount={completedCount}

@@ -1,11 +1,7 @@
-import React from 'react';
-
 import { fetchAllGamePages } from '@/api/api';
-import { SearchProvider } from '@/components/contexts/SearchContext';
 import { Content } from '@/types/contentTypes';
-import HomePage from '../components/pages/HomePage';
 
-interface HomeProps {
+export interface HomePageProps {
     gamePages: Content[];
     gamePagesCollection: Content[];
     gamePagesWishList: Content[];
@@ -13,66 +9,43 @@ interface HomeProps {
     gamePagesFriends: Content[];
 }
 
-const Home: React.FC<HomeProps> = ({ gamePages, gamePagesCollection, gamePagesWishList, gamePagesCompleted, gamePagesFriends }) => {
-    return (
-        <SearchProvider>
-            <HomePage 
-                gamePages={gamePages}
-                gamePagesCollection={gamePagesCollection} 
-                gamePagesWishList={gamePagesWishList}
-                gamePagesCompleted={gamePagesCompleted}
-                gamePagesFriends={gamePagesFriends}
-            />
-        </SearchProvider>
-    );
-};
-
-// Fetch data at build time
-export const getStaticProps = async () => {
+export const getHomePageProps = async () => {
     try {
         const gamePages = await fetchAllGamePages();
-        
-        // Helper function for consistent sorting
-        const sortByTitle = (a: Content, b: Content) => 
-            a.title.trim().localeCompare(b.title.trim(), undefined, { 
+
+        const sortByTitle = (a: Content, b: Content) =>
+            a.title.trim().localeCompare(b.title.trim(), undefined, {
                 sensitivity: 'base',
-                numeric: true 
+                numeric: true,
             });
-        
-        // Filter by category field from Contentful
-        // If category is not set, default to 'collection'
+
         const gamePagesCollection = gamePages
             .filter(game => game.category === 'Collection' || !game.category)
             .sort(sortByTitle);
         const gamePagesWishList = gamePages
             .filter(game => game.category === 'Wishlist')
             .sort(sortByTitle);
-        
-        // Played Games: Games with category === 'game' OR games from collection/wishlist that have a rating
+
         const gamePagesCompleted = gamePages
             .filter(game => {
-                // Games with category === 'game'
                 if (game.category === 'Game') {
                     return true;
                 }
-                // Games from collection or wishlist that have a rating/score
                 const isInCollection = game.category === 'Collection' || !game.category;
                 const isInWishlist = game.category === 'Wishlist';
                 return (isInCollection || isInWishlist) && game.rating !== undefined;
             })
             .sort(sortByTitle);
-        
-        // Friends: All games that have the friends field with any value
+
         const gamePagesFriends = gamePages
             .filter(game => game.friends && game.friends.length > 0)
             .sort(sortByTitle);
-        
-        // Keep sorted for backward compatibility
+
         const sortedGamePages = gamePages.sort(sortByTitle);
-        
+
         return {
             props: {
-                gamePages: sortedGamePages, // Keep for backward compatibility
+                gamePages: sortedGamePages,
                 gamePagesCollection,
                 gamePagesWishList,
                 gamePagesCompleted,
@@ -94,5 +67,3 @@ export const getStaticProps = async () => {
         };
     }
 };
-
-export default Home;

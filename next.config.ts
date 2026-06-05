@@ -17,6 +17,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/collection',
+        permanent: true,
+      },
+    ];
+  },
   async rewrites() {
     return [
       {
